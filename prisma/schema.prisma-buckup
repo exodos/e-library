@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+
+
+model Book {
+  id                Int       @id @default(autoincrement()) @map("id")
+  bookTitle         String    @map("book_title") @db.VarChar()
+  bookDescription   String    @map("book_description") @db.Text
+  bookYear          Int       @map("book_year") @db.Integer
+  bookAuthor        String    @map("book_author") @db.VarChar()
+  bookPublisher     String    @map("book_publisher") @db.VarChar()
+  bookIsbn          String    @unique @map("book_isbn") @db.VarChar()
+  bookRecommendedBy String    @map("book_recommended_by") @db.VarChar()
+  bookCategory      String    @map("book_category") @db.VarChar()
+  bookUrl           String    @map("book_url") @db.Text
+  bookThumb         String    @map("book_thumb") @db.Text
+  published         Boolean   @default(false)
+  bookRating        Int       @default(0)
+  visitors          Visitor[]
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Date
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Date
+
+  @@map("books")
+}
+
+model User {
+  oracleId   Int       @id @map("oracle_id") @db.Integer
+  userName   String    @unique @map("user_name") @db.VarChar()
+  fullName   String    @map("full_name") @db.VarChar()
+  jobRole    String?   @map("job_role") @db.VarChar()
+  email      String    @unique @map("email") @db.VarChar()
+  division   String?   @map("division") @db.VarChar()
+  department String?   @map("department") @db.VarChar()
+  role       Role      @default(USER)
+  visitors   Visitor[]
+
+  @@map("users")
+}
+
+model Visitor {
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    Int
+  user      User     @relation(fields: [userId], references: [oracleId])
+  userId    Int
+  visitedAt DateTime @default(now()) @map("visited_at") @db.Date
+
+  @@id([bookId, userId])
+  @@map("visitors")
+}
+
+model Catalogue {
+  id            Int      @id @default(autoincrement()) @map("id")
+  bookTitle     String   @map("book_title") @db.VarChar()
+  bookYear      Int      @map("book_year") @db.Integer
+  bookAuthor    String   @map("book_author") @db.VarChar()
+  bookPublisher String   @map("book_publisher") @db.VarChar()
+  bookIsbn      String   @unique @map("book_isbn") @db.VarChar()
+  shelfNumber   Int      @map("shelf_number") @db.Integer
+  rawNumber     Int      @map("raw_number") @db.Integer
+  createdAt     DateTime @default(now()) @map("created_at") @db.Date
+  updatedAt     DateTime @default(now()) @map("updated_at") @db.Date
+
+  @@map("catalogues")
+}
+
+enum Role {
+  USER
+  CONTRIBUTOR
+  ADMIN
+}

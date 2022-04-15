@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  oracleId   Int       @id
+  userName   String    @unique @map("user_name")
+  fullName   String    @map("full_name")
+  jobRole    String?   @map("job_role")
+  email      String    @unique
+  division   String?
+  department String?
+  role       Role      @default(USER)
+  visitors   Visitor[]
+
+
+  @@map("users")
+}
+
+model Book {
+  id                Int       @id @default(autoincrement())
+  bookTitle         String    @map("book_title")
+  bookDescription   String    @map("book_description") @db.Text
+  bookYear          Int       @map("book_year")
+  bookAuthor        String    @map("book_author")
+  bookPublisher     String    @map("book_publisher")
+  bookIsbn          String    @unique @map("book_isbn")
+  bookRecommendedBy String    @map("book_recommended_by")
+  bookCategory      String    @map("book_category")
+  bookUrl           String    @map("book_url") @db.Text
+  bookThumb         String    @map("book_thumb") @db.Text
+  published         Boolean   @default(false)
+  bookRating        Int       @default(0) @map("book_rating")
+  visitors          Visitor[]
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Date
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Date
+
+  @@map("books")
+}
+
+model Visitor {
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId    Int      @map("book_id")
+  user      User     @relation(fields: [userId], references: [oracleId], onDelete: Cascade)
+  userId    Int      @map("user_id")
+  visitedAt DateTime @default(now()) @db.Date
+
+  @@id([bookId, userId])
+  @@map("visitors")
+}
+
+model Catalogue {
+  id            Int      @id @default(autoincrement())
+  bookTitle     String   @map("book_title")
+  bookYear      Int      @map("book_year")
+  bookAuthor    String
+  bookPublisher String
+  bookIsbn      String   @unique
+  shelfNumber   Int
+  rawNumber     Int
+  createdAt     DateTime @default(now()) @db.Date
+  updatedAt     DateTime @default(now()) @db.Date
+
+
+  @@map("catalogues")
+}
+
+enum Role {
+  USER
+  CONTRIBUTOR
+  ADMIN
+}
