@@ -120,7 +120,7 @@ export default NextAuth({
                       } else {
                         user = checkUser;
                       }
-                      resolve({ user });
+                      resolve(user);
                     } catch (err) {
                       console.log(err);
                     }
@@ -140,17 +140,17 @@ export default NextAuth({
     error: "/auth/sign-in",
   },
   callbacks: {
-    // signIn: async ({ user, account, profile, email, credentials }) => {
-    //   const isAllowedToSignIn = true;
-    //   if (isAllowedToSignIn) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // },
-    // redirect: async ({ url, baseUrl }) => {
-    //   return baseUrl;
-    // },
+    signIn: async ({ user, account, profile, email, credentials }) => {
+      const isAllowedToSignIn = true;
+      if (isAllowedToSignIn) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    redirect: async ({ url, baseUrl }) => {
+      return baseUrl;
+    },
     jwt: async ({ token, user }) => {
       const isSignIn = user ? true : false;
       if (isSignIn) {

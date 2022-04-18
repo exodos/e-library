@@ -1,6 +1,7 @@
 import { CloudUploadIcon, SearchCircleIcon } from "@heroicons/react/solid";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useContext, useEffect, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
 import useSWR from "swr";
@@ -12,7 +13,7 @@ import { UserContext } from "../../store/user-context";
 const ReportExport = ({ visitorList }) => {
   // const fetcher = (...args) => fetch(...args).then((res) => res.json());
   // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
-  const user = useContext(UserContext);
+  const { user } = useContext(UserContext);
   if (!user) {
     return "Loading";
   }

@@ -69,7 +69,7 @@ const UploadBooks = () => {
     { value: "Marketing", label: "Marketing" },
     { value: "Sales", label: "Sales" },
     {
-      value: "Customer Experience & Quality Management",
+      value: "Customer Experience And Quality Management",
       label: "Customer Experience & Quality Management",
     },
     {
@@ -83,15 +83,15 @@ const UploadBooks = () => {
     },
     { value: "Finance", label: "Finance" },
     { value: "Supply Chain", label: "Supply Chain" },
-    { value: "Facilities & Fleet", label: "Facilities & Fleet" },
+    { value: "Facilities And Fleet", label: "Facilities & Fleet" },
     { value: "Internal Audit", label: "Internal Audit" },
     { value: "Legal", label: "Legal" },
     { value: "Physical Security", label: "Physical Security" },
     { value: "Communication", label: "Communication" },
-    { value: "Ethics & Anticorruption", label: "Ethics & Anticorruption" },
+    { value: "Ethics And Anticorruption", label: "Ethics & Anticorruption" },
     {
-      value: "Zone & Regional Coordination",
-      label: "Zone & Regional Coordination",
+      value: "Zone Or Regional Coordination",
+      label: "Zone/Regional Coordination",
     },
     { value: "Information Systems", label: "Information Systems" },
     { value: "Information Security", label: "Information Security" },
@@ -103,7 +103,7 @@ const UploadBooks = () => {
     },
     { value: "Fixed Network", label: "Fixed Network" },
     { value: "CTO", label: "CTO" },
-    { value: "Leadership & Management", label: "Leadership & Management" },
+    { value: "Leadership And Management", label: "Leadership & Management" },
     { value: "Transversal", label: "Transversal" },
   ];
 

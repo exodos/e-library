@@ -60,37 +60,43 @@ const BookList = ({ bookData }) => {
             </div>
           ))}
       </div>
-      <div className="text-deepBlue text-md font-semibold pt-2 pr-5">
-        <span className="text-sm bg-yellow-300 text-gray-800">
-          {bookData.totalBooks}
-        </span>{" "}
-        Books
-      </div>
-      <ReactPaginate
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={5}
-        previousLabel={"Previous"}
-        nextLabel={"Next"}
-        breakLabel={"..."}
-        initialPage={bookData.curPage - 1}
-        pageCount={bookData.maxPage}
-        onPageChange={handlePaginate}
-        containerClassName={
-          "border-t border-gray-200 px-4 flex items-center justify-between sm:px-0 mt-6"
-        }
-        subContainerClassName={
-          "border-t-2 border-transparent pt-4 pr-2 pl-2 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-black"
-        }
-        pageClassName={
-          "border-transparent text-gray-700 hover:text-gray-900 hover:border-black border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
-        }
-        nextClassName={
-          "border-t-2 border-transparent pt-4 pr-3 inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-700 hover:border-black"
-        }
-        previousLinkClassName={
-          "border-t-2 border-transparent pt-4 pl-3 inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-700 hover:border-black"
-        }
-      />
+      {books?.length > 0 && (
+        <div className="text-deepBlue text-md font-semibold pt-1">
+          <span className="text-sm bg-yellow-400 text-gray-800">
+            Total Books:{" "}
+          </span>
+          <span className="text-sm bg-yellow-400 text-gray-800">
+            {bookData.totalBooks}
+          </span>{" "}
+        </div>
+      )}
+      {books?.length > 0 && (
+        <ReactPaginate
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          previousLabel={"Previous"}
+          nextLabel={"Next"}
+          breakLabel={"..."}
+          initialPage={bookData.curPage - 1}
+          pageCount={bookData.maxPage}
+          onPageChange={handlePaginate}
+          containerClassName={
+            "border-t border-gray-200 px-4 flex items-center justify-between sm:px-0 mt-6"
+          }
+          subContainerClassName={
+            "border-t-2 border-transparent pt-4 pr-2 pl-2 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-black"
+          }
+          pageClassName={
+            "border-transparent text-gray-700 hover:text-gray-900 hover:border-black border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
+          }
+          nextClassName={
+            "border-t-2 border-transparent pt-4 pr-3 inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-700 hover:border-black"
+          }
+          previousLinkClassName={
+            "border-t-2 border-transparent pt-4 pl-3 inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-700 hover:border-black"
+          }
+        />
+      )}
     </>
   );
 };

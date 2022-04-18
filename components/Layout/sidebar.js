@@ -7,19 +7,20 @@ import {
   HomeIcon,
   MenuAlt1Icon,
   XIcon,
-  UserGroupIcon,
   LightningBoltIcon,
-  DocumentSearchIcon,
   SupportIcon,
   DocumentReportIcon,
   CheckCircleIcon,
   UploadIcon,
   ChevronDownIcon,
+  UsersIcon,
 } from "@heroicons/react/solid";
-import UserHeader from "../users/user-header";
 import SearchBooks from "../books/search-books";
-import UserList from "../users/user-list";
-import { BookOpenIcon } from "@heroicons/react/outline";
+import {
+  BookOpenIcon,
+  CurrencyDollarIcon,
+  CogIcon,
+} from "@heroicons/react/solid";
 import { baseUrl } from "../../client/config";
 import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
@@ -28,7 +29,7 @@ const navigation = [
   { name: "Dashboard", icon: HomeIcon, current: true, href: "/" },
   {
     name: "Commericial",
-    icon: UserGroupIcon,
+    icon: CurrencyDollarIcon,
     current: false,
     children: [
       { name: "Customer Service", href: `/nav/Customer Service` },
@@ -49,7 +50,7 @@ const navigation = [
       { name: "Finanace", href: `/nav/Finanace` },
       {
         name: "Customer Experience & Qlt Mgt",
-        href: `/nav/Customer Experience & Quality Management`,
+        href: `/nav/Customer Experience And Quality Management`,
       },
       {
         name: "TeXA",
@@ -57,21 +58,24 @@ const navigation = [
       },
       { name: "Supply & Chain", href: `/nav/Supply Chain` },
 
-      { name: "Facilities & Fleet", href: `/nav/Facilities & Fleet` },
+      { name: "Facilities & Fleet", href: `/nav/Facilities And Fleet` },
       { name: "Internal Audit", href: `/nav/Internal Audit` },
       { name: "Legal", href: `/nav/Legal` },
       { name: "Physical Security", href: `/nav/Physical Security` },
       { name: "Communication", href: `/nav/Communication` },
-      { name: "Ethics & Anticorruption", href: `/nav/Ethics & Anticorruption` },
+      {
+        name: "Ethics & Anticorruption",
+        href: `/nav/Ethics And Anticorruption`,
+      },
       {
         name: "Zone/Regional Coordination",
-        href: `/nav/Zone & Regional Coordination`,
+        href: `/nav/Zone Or Regional Coordination`,
       },
     ],
   },
   {
     name: "Technical",
-    icon: DocumentSearchIcon,
+    icon: CogIcon,
     current: false,
     children: [
       { name: "Information Systems", href: `/nav/Information Systems` },
@@ -87,13 +91,15 @@ const navigation = [
     ],
   },
   {
+    name: "Leadership & Management",
+    icon: UsersIcon,
+    href: `/nav/Leadership And Management`,
+  },
+  {
     name: "Others",
     icon: LightningBoltIcon,
     current: false,
-    children: [
-      { name: "Leadership & Management", href: "/nav/Leadership & Management" },
-      { name: "Transversal", href: "/nav/Transversal" },
-    ],
+    children: [{ name: "Transversal", href: "/nav/Transversal" }],
   },
   { name: "Online Catelog", icon: BookOpenIcon, href: "/catalogue" },
 ];
@@ -583,8 +589,6 @@ const Sidebar = (props) => {
             <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
               <SearchBooks />
               <div className="ml-4 flex items-center md:ml-6">
-                {/* <UserHeader user={user} /> */}
-
                 <button
                   type="button"
                   className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"

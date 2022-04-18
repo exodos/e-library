@@ -1,19 +1,19 @@
-// import { getToken } from "next-auth/jwt";
+import { getToken } from "next-auth/jwt";
 import { getSession } from "next-auth/react";
 import prisma from "../../../utils/prisma";
 
-// const secret = process.env.NEXTAUTH_SECRET;
+const secret = process.env.NEXTAUTH_SECRET;
 
 const handler = async (req, res) => {
-  // const token = await getToken({ req, secret });
-  // const userId = token.id;
-  const session = await getSession({ req });
+  const token = await getToken({ req, secret });
+  const userId = token.id;
+  // const session = await getSession({ req });
 
   try {
     const user = await prisma.user.findUnique({
       where: {
-        // oracleId: parseInt(session.oracleId),
-        oracleId: 6674,
+        oracleId: parseInt(userId),
+        // oracleId: 6674,
       },
     });
     console.log(user);

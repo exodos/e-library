@@ -27,8 +27,6 @@ const NavMenu = ({ bookData }) => {
     }
   }, [bookData]);
 
-  // console.log(bookData.totalBooks);
-
   const handlePaginate = (page) => {
     const path = router.pathname;
     const query = router.query;
@@ -83,7 +81,17 @@ const NavMenu = ({ bookData }) => {
                 </div>
               ))}
           </div>
-          {books.length > 0 && (
+          {books?.length > 0 && (
+            <div className="text-deepBlue text-md font-semibold pt-1">
+              <span className="text-sm bg-yellow-400 text-gray-800">
+                Total Books:{" "}
+              </span>
+              <span className="text-sm bg-yellow-400 text-gray-800">
+                {bookData.totalBooks}
+              </span>{" "}
+            </div>
+          )}
+          {books?.length > 0 && (
             <ReactPaginate
               marginPagesDisplayed={2}
               pageRangeDisplayed={5}
