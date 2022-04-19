@@ -47,40 +47,44 @@ const NavMenu = ({ bookData }) => {
             </h2>
           )}
           {books.length <= 0 && (
-            <h2 className="text-lg leading-6 font-semibold text-eRed">
-              Sorry, We Couldn't Find Books Recommended By {slug}
-            </h2>
+            <div className="mt-8 p-5 justify-center items-center bg-white">
+              <h2 className="text-lg leading-6 font-semibold text-eRed">
+                Sorry, We Could not Find Books Recommended By {slug}
+              </h2>
+            </div>
           )}
 
-          <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue py-5">
-            {books.length > 0 &&
-              books.map((item, i) => (
-                <div
-                  key={i}
-                  className="bg-white overflow-hidden shadow rounded-lg"
-                >
-                  <div className="p-5">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-1">
-                        <div className="bg-white overflow-hidden shadow rounded-lg">
-                          <Link href={`/books/${item.id}`}>
-                            <a>
-                              <Image
-                                src={`/book-images/${item.bookThumb}`}
-                                width={200}
-                                height={300}
-                                title={item.bookTitle}
-                                alt={item.bookTitle}
-                              />
-                            </a>
-                          </Link>
+          {books?.length > 0 && (
+            <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue py-5">
+              {books.length > 0 &&
+                books.map((item, i) => (
+                  <div
+                    key={i}
+                    className="bg-white overflow-hidden shadow rounded-lg"
+                  >
+                    <div className="p-5">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-1">
+                          <div className="bg-white overflow-hidden shadow rounded-lg">
+                            <Link href={`/books/${item.id}`}>
+                              <a>
+                                <Image
+                                  src={`/book-images/${item.bookThumb}`}
+                                  width={200}
+                                  height={300}
+                                  title={item.bookTitle}
+                                  alt={item.bookTitle}
+                                />
+                              </a>
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-          </div>
+                ))}
+            </div>
+          )}
           {books?.length > 0 && (
             <div className="text-deepBlue text-md font-semibold pt-1">
               <span className="text-sm bg-yellow-400 text-gray-800">

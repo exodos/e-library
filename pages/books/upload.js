@@ -82,7 +82,7 @@ const UploadBooks = () => {
       label: "Telecom Excellence Academy",
     },
     { value: "Finance", label: "Finance" },
-    { value: "Supply Chain", label: "Supply Chain" },
+    { value: "Supply And Chain", label: "Supply & Chain" },
     { value: "Facilities And Fleet", label: "Facilities & Fleet" },
     { value: "Internal Audit", label: "Internal Audit" },
     { value: "Legal", label: "Legal" },
@@ -471,7 +471,7 @@ const UploadBooks = () => {
                         <div className="flex text-sm text-gray-600">
                           <label
                             htmlFor="file"
-                            className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                            className="relative cursor-pointer bg-white rounded-md font-medium text-deepGreen hover:text-lightGreen focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-lightGreen"
                           >
                             <span>Upload a file</span>
                             <input
@@ -507,9 +507,9 @@ const UploadBooks = () => {
                     </Link>
                     <button
                       type="submit"
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-deepGreen hover:bg-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                      Save
+                      Upload
                     </button>
                   </div>
                 </div>

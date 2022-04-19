@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 
 const Hero = ({ children }) => {
   return (
@@ -10,25 +11,43 @@ const Hero = ({ children }) => {
           content="Corporate Library Management System"
         />
       </Head>
-      <div className="min-h-full bg-white">
-        <div>{children}</div>
+      <div className="h-screen bg-white">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
+        {/* <div>{children}</div> */}
+        <footer className="bg-white" aria-label="footer-heading">
+          <h2 id="footer-heading" className="sr-only">
+            Footer
+          </h2>
+          <div className="max-w-8xl mx-auto py-8 px-4 sm:px-6 lg:py-7 lg:px-8">
+            {/* <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8"> */}
 
-        <div className="mt-5 pt-5 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <footer
-            className="sm:flex sm:items-center bg-no-repeat"
-            style={{
-              backgroundImage: 'url("/image/Ethio-footer.png")',
-            }}
-          >
-            <div className="max-w-8xl mx-auto px-4 py-40 sm:px-4 lg:px-6">
-              <div className="flex justify-start space-x-10 md:order-2">
-                <p className="text-center text-base text-gray-400">
-                  &copy; 2020 ethio telecom. All rights reserved.
+            <div className="sm:flex sm:items-center">
+              <div className="sm:flex-auto pt-4">
+                <Image
+                  className="h-8 w-auto"
+                  src="/image/Ethio_footer_left.png"
+                  alt="Ethiotelecom Left Footer"
+                  width={140}
+                  height={234}
+                />
+              </div>
+              <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+                <p className="text-base text-gray-400">
+                  &copy; 2022 ethio telecom. All rights reserved
                 </p>
               </div>
+              <div className="sm:mt-0 sm:ml-8 sm:flex-none pt-4">
+                <Image
+                  className="h-8 w-auto"
+                  src="/image/Ethio_footer_right.png"
+                  alt="Ethiotelecom Right Footer"
+                  width={220}
+                  height={200}
+                />
+              </div>
             </div>
-          </footer>
-        </div>
+          </div>
+        </footer>
       </div>
     </>
   );

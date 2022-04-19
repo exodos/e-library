@@ -5,6 +5,7 @@ import NotificationContext from "../../store/notification-context";
 import Router from "next/router";
 import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
+import { XIcon } from "@heroicons/react/solid";
 
 const EditCatalogue = ({ catalogue }) => {
   // const fetcher = (...args) => fetch(...args).then((res) => res.json());

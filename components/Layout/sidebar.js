@@ -56,7 +56,7 @@ const navigation = [
         name: "TeXA",
         href: `/nav/Telecom Excellence Academy`,
       },
-      { name: "Supply & Chain", href: `/nav/Supply Chain` },
+      { name: "Supply & Chain", href: `/nav/Supply And Chain` },
 
       { name: "Facilities & Fleet", href: `/nav/Facilities And Fleet` },
       { name: "Internal Audit", href: `/nav/Internal Audit` },

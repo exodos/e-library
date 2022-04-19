@@ -11,7 +11,7 @@ const Home = ({ bookData }) => {
     return "Loading";
   }
   const userId = user.oracleId;
-  console.log(userId);
+  // console.log(userId);
   return (
     <>
       <Head>
