@@ -1,8 +1,7 @@
-import { CloudUploadIcon, SearchCircleIcon } from "@heroicons/react/solid";
-import { getSession } from "next-auth/react";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext } from "react";
 import { CSVLink } from "react-csv";
 import useSWR from "swr";
 import { baseUrl } from "../../client/config";
@@ -50,8 +49,14 @@ const ReportExport = ({ visitorList }) => {
   );
 };
 
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
 
   if (!session) {
     return {

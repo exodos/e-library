@@ -28,7 +28,7 @@ const UserList = ({ user }) => {
       </div>
       {allowed && (
         <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-          <Link href={"/books/upload"}>
+          <Link href={"/books/upload"} passHref>
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lightGreen  hover:bg-deepGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -41,7 +41,7 @@ const UserList = ({ user }) => {
             </button>
           </Link>
           {/* {status === "authenticated" && session.user.name === "tsegay" && ( */}
-          <Link href={"/publish"}>
+          <Link href={"/publish"} passHref>
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lightGreen hover:bg-deepGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"

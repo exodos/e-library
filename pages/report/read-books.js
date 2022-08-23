@@ -1,16 +1,16 @@
-import { CloudUploadIcon, SearchCircleIcon } from "@heroicons/react/solid";
-import { getSession } from "next-auth/react";
+import { SearchCircleIcon } from "@heroicons/react/solid";
+import { unstable_getServerSession } from "next-auth";
 import Head from "next/head";
-import { useContext, useEffect, useRef, useState } from "react";
-import useSWR from "swr";
+import { useContext, useRef } from "react";
 import { baseUrl } from "../../client/config";
 import ReadBook from "../../components/report/read-book";
 import { UserContext } from "../../store/user-context";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 const MostReadBooks = ({ visitorList }) => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
   const { user } = useContext(UserContext);
+
+  const formRef = useRef();
   if (!user) {
     return "Loading";
   }
@@ -18,8 +18,6 @@ const MostReadBooks = ({ visitorList }) => {
   if (user && user.role !== "ADMIN") {
     Router.push("/");
   }
-
-  const formRef = useRef();
 
   const submitSearch = async () => {
     const { dateFrom, dateTo } = formRef.current;
@@ -111,8 +109,13 @@ const MostReadBooks = ({ visitorList }) => {
   );
 };
 
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
 
   if (!session) {
     return {
@@ -123,7 +126,7 @@ export const getServerSideProps = async (ctx) => {
     };
   }
 
-  const { query } = ctx;
+  const { query } = context;
 
   const page = query.page || 1;
   const searchBook = query.search;

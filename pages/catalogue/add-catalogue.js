@@ -11,22 +11,11 @@ import * as Yup from "yup";
 import { getSession } from "next-auth/react";
 import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 const AddCatalogue = () => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
   const { user } = useContext(UserContext);
-  if (!user) {
-    return "Loading";
-  }
-  let allowed = false;
-
-  if (!user) {
-    return "Loading";
-  }
-  if (user.role === "ADMIN") {
-    allowed = true;
-  }
   const [query, setQuery] = useState({
     bookTitle: "",
     bookYear: "",
@@ -60,6 +49,19 @@ const AddCatalogue = () => {
   const { errors } = formState;
 
   const notificationCtx = useContext(NotificationContext);
+
+  if (!user) {
+    return "Loading";
+  }
+
+  let allowed = false;
+
+  if (!user) {
+    return "Loading";
+  }
+  if (user.role === "ADMIN") {
+    allowed = true;
+  }
 
   const handleChange = () => (e) => {
     const name = e.target.name;
@@ -357,7 +359,7 @@ const AddCatalogue = () => {
                 </div>
                 <div className="pt-5">
                   <div className="flex justify-center">
-                    <Link href="/catalogue">
+                    <Link href="/catalogue" passHref>
                       <button
                         type="button"
                         className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -382,8 +384,14 @@ const AddCatalogue = () => {
   );
 };
 
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
 
   if (!session) {
     return {

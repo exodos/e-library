@@ -4,6 +4,9 @@ import Head from "next/head";
 import prisma from "../../utils/prisma";
 import Custom404 from "../404";
 import { getSession } from "next-auth/react";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
+import { baseUrl } from "../../client/config";
 
 const BookViewer = dynamic(() => import("../../components/books/book-viewer"), {
   ssr: false,
@@ -34,8 +37,13 @@ const DisplayBook = ({ selectedBook }) => {
   );
 };
 
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
   if (!session) {
     return {
       redirect: {
@@ -45,15 +53,16 @@ export const getServerSideProps = async (ctx) => {
     };
   }
 
-  const { params } = ctx;
+  const { params } = context;
+  const bookId = params.bookId;
 
   let selectedBook = null;
   try {
-    selectedBook = await prisma.Book.findUnique({
-      where: {
-        id: parseInt(params.bookId),
-      },
-    });
+    const res = await fetch(baseUrl + `/display?bookId=${bookId}`);
+    if (res.status !== 200) {
+      throw new Error("Could not get books with that Id");
+    }
+    selectedBook = await res.json();
   } catch (err) {
     console.log(err.message);
   }

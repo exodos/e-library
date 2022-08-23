@@ -2,27 +2,17 @@ import React, { useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import UserList from "../../components/users/user-list";
 import { baseUrl } from "../../client/config";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
-import { getSession } from "next-auth/react";
-import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
+import { getSession } from "next-auth/react";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 const Publish = ({ bookData }) => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
   const { user } = useContext(UserContext);
-  if (!user) {
-    return "Loading";
-  }
   const router = useRouter();
-
-  if (user && user.role !== "ADMIN") {
-    router.push("/");
-  }
-
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
@@ -38,6 +28,14 @@ const Publish = ({ bookData }) => {
       }
     }
   }, [bookData]);
+
+  // if (!user) {
+  //   return "Loading";
+  // }
+
+  // if (user && user.role !== "ADMIN") {
+  //   router.push("/");
+  // }
 
   const handlePaginate = (page) => {
     const path = router.pathname;
@@ -119,8 +117,13 @@ const Publish = ({ bookData }) => {
   );
 };
 
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
   if (!session) {
     return {
       redirect: {
@@ -130,7 +133,7 @@ export const getServerSideProps = async (ctx) => {
     };
   }
 
-  const { query } = ctx;
+  const { query } = context;
 
   const page = query.page || 1;
   const searchBook = query.search;

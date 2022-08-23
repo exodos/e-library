@@ -14,7 +14,7 @@ const handler = async (req, res) => {
           oracleId: parseInt(userId),
         },
       });
-      console.log(user);
+      // console.log(user);
       res.json(user);
     } catch (err) {
       console.log(err);
@@ -23,7 +23,6 @@ const handler = async (req, res) => {
   } else {
     res.status(401).json({ message: "Not Logged In" });
   }
-  // const session = await getSession({ req });
 };
 
 export default handler;

@@ -21,16 +21,8 @@ module.exports = {
         eWhite: "#FFFFFF",
         eGrey: "#d3d3d3",
         eBlack: "#000000",
-
-        myGray100: "#6c19e1",
-        myGray800: "#343036",
-        success100: "#a2f0bc",
-        success500: "#12bd4b",
-        error500: "#a10c4a",
-        myBlack: "#1b1b1b",
-        myPending: "#177cbe",
-        mySuccess: "#10be58",
-        myError: "#e65035",
+        texaBlue: "#0a73b7",
+        texaRed: "#e92028",
       },
       screens: {
         sm: "640px",

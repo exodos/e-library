@@ -12,20 +12,12 @@ import * as Yup from "yup";
 import { getSession } from "next-auth/react";
 import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
+import { unstable_getServerSession } from "next-auth";
 
 const UploadBooks = () => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
-
   const { user } = useContext(UserContext);
-  if (!user) {
-    return "Loading";
-  }
   const router = useRouter();
-
-  if (user && user.role === "USER") {
-    router.push("/");
-  }
 
   const [query, setQuery] = useState({
     bookTitle: "",
@@ -64,7 +56,6 @@ const UploadBooks = () => {
   const { errors } = formState;
 
   const recommendedOptions = [
-    { value: "", label: "Please Select" },
     { value: "Customer Service", label: "Customer Service" },
     { value: "Marketing", label: "Marketing" },
     { value: "Sales", label: "Sales" },
@@ -108,6 +99,14 @@ const UploadBooks = () => {
   ];
 
   const notificationCtx = useContext(NotificationContext);
+
+  if (!user) {
+    return "Loading";
+  }
+
+  if (user && user.role === "USER") {
+    router.push("/");
+  }
 
   const handleFileChange = () => (e) => {
     setQuery((prevState) => ({
@@ -394,6 +393,9 @@ const UploadBooks = () => {
                                 name="bookRecommendedBy"
                                 // autoComplete={query.book_recommended_by}
                               >
+                                <option disabled value="">
+                                  Select Recommended By
+                                </option>
                                 {recommendedOptions.map((option) => (
                                   <option
                                     key={option.value}
@@ -497,7 +499,7 @@ const UploadBooks = () => {
 
                 <div className="pt-5">
                   <div className="flex justify-center">
-                    <Link href="/">
+                    <Link href="/" passHref>
                       <button
                         type="button"
                         className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -521,8 +523,13 @@ const UploadBooks = () => {
     </>
   );
 };
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
   if (!session) {
     return {
       redirect: {
@@ -531,39 +538,6 @@ export const getServerSideProps = async (ctx) => {
       },
     };
   }
-
-  // const userId = session.id;
-  // let userRole = null;
-  // let allowed = false;
-
-  // try {
-  //   const user = await fetch(baseUrl + `/user-list/users`);
-  //   const role = user.json();
-  //   userRole = role.role;
-  //   // const role = await fetch(baseUrl + `/user-list/user-role/${userId}`);
-  //   // const uRole = await role.json();
-  //   // userRole = uRole.role;
-  // } catch (err) {
-  //   console.log(err);
-  // }
-
-  // console.log(userRole);
-
-  // if (
-  //   userRole !== null &&
-  //   (userRole === "CONTRIBUTOR" || userRole === "ADMIN")
-  // ) {
-  //   allowed = true;
-  // }
-
-  // if (!allowed) {
-  //   return {
-  //     redirect: {
-  //       permanent: false,
-  //       destination: "/",
-  //     },
-  //   };
-  // }
 
   return {
     props: {

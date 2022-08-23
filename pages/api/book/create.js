@@ -3,6 +3,7 @@ import nc from "next-connect";
 import path from "path";
 import prisma from "../../../utils/prisma";
 import { fromPath } from "pdf2pic";
+
 import { getSession } from "next-auth/react";
 
 export const config = {
@@ -41,15 +42,15 @@ const handler = nc({
     res.status(404).end("Page is not found");
   },
 })
-  .use(async (req, res, next) => {
-    const session = await getSession({ req });
-    if (!session) {
-      res.status(401).json({ message: "unauthenticated" });
-      // next();
-    } else {
-      next();
-    }
-  })
+  // .use(async (req, res, next) => {
+  //   const session = await getSession({ req });
+  //   if (!session) {
+  //     res.status(401).json({ message: "unauthenticated" });
+  //     // next();
+  //   } else {
+  //     next();
+  //   }
+  // })
   .use(upload.single("file"))
   .post(async (req, res) => {
     const {

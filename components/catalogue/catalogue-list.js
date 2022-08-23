@@ -10,19 +10,8 @@ import { baseUrl } from "../../client/config";
 import { UserContext } from "../../store/user-context";
 
 const CatalogueList = ({ catalogueData }) => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
-
   const { user } = useContext(UserContext);
 
-  let allowed = false;
-
-  if (!user) {
-    return "Loading";
-  }
-  if (user.role === "ADMIN") {
-    allowed = true;
-  }
   const [catalogue, setCatalogue] = useState([]);
   const [editList, setEditList] = useState(null);
   const [deleteList, setDeleteList] = useState(null);
@@ -44,6 +33,15 @@ const CatalogueList = ({ catalogueData }) => {
       }
     }
   }, [catalogueData]);
+
+  let allowed = false;
+
+  if (!user) {
+    return "Loading";
+  }
+  if (user.role === "ADMIN") {
+    allowed = true;
+  }
 
   const handlePaginate = (page) => {
     const path = router.pathname;

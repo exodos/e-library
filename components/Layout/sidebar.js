@@ -207,9 +207,8 @@ const Sidebar = (props) => {
                   {navigation.map((item) =>
                     !item.children ? (
                       <div key={item.name}>
-                        <Link href={item.href}>
+                        <Link href={item.href} passHref>
                           <a
-                            // href="#"
                             className={classNames(
                               item.current
                                 ? "bg-gray-100 text-gray-900"
@@ -269,7 +268,11 @@ const Sidebar = (props) => {
                             </Disclosure.Button>
                             <Disclosure.Panel className="space-y-1">
                               {item.children.map((subItem) => (
-                                <Link key={subItem.name} href={subItem.href}>
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  passHref
+                                >
                                   <a>
                                     <Disclosure.Button
                                       key={subItem.name}
@@ -295,9 +298,8 @@ const Sidebar = (props) => {
                         secondaryNavigation.map((item) =>
                           !item.children ? (
                             <div key={item.name}>
-                              <Link href={item.href}>
+                              <Link href={item.href} passHref>
                                 <a
-                                  // href="#"
                                   className={classNames(
                                     item.current
                                       ? "bg-gray-100 text-gray-900"
@@ -360,12 +362,11 @@ const Sidebar = (props) => {
                                       <Link
                                         key={subItem.name}
                                         href={subItem.href}
+                                        passHref
                                       >
                                         <a>
                                           <Disclosure.Button
                                             key={subItem.name}
-                                            // as="a"
-                                            // href={subItem.href}
                                             className="group w-full flex items-center pl-11 pr-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50"
                                           >
                                             {subItem.name}
@@ -409,7 +410,7 @@ const Sidebar = (props) => {
               {navigation.map((item) =>
                 !item.children ? (
                   <div key={item.name}>
-                    <Link href={item.href}>
+                    <Link href={item.href} passHref>
                       <a
                         className={classNames(
                           item.current
@@ -463,7 +464,11 @@ const Sidebar = (props) => {
                         </Disclosure.Button>
                         <Disclosure.Panel className="space-y-1">
                           {item.children.map((subItem) => (
-                            <Link key={subItem.name} href={subItem.href}>
+                            <Link
+                              key={subItem.name}
+                              href={subItem.href}
+                              passHref
+                            >
                               <a>
                                 <Disclosure.Button
                                   key={subItem.name}
@@ -489,7 +494,7 @@ const Sidebar = (props) => {
                     secondaryNavigation.map((item) =>
                       !item.children ? (
                         <div key={item.name}>
-                          <Link href={item.href}>
+                          <Link href={item.href} passHref>
                             <a
                               className={classNames(
                                 item.current
@@ -550,7 +555,11 @@ const Sidebar = (props) => {
                               </Disclosure.Button>
                               <Disclosure.Panel className="space-y-1">
                                 {item.children.map((subItem) => (
-                                  <Link key={subItem.name} href={subItem.href}>
+                                  <Link
+                                    key={subItem.name}
+                                    href={subItem.href}
+                                    passHref
+                                  >
                                     <a>
                                       <Disclosure.Button
                                         key={subItem.name}
@@ -704,7 +713,7 @@ const Sidebar = (props) => {
                   </div>
                   <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
                     {contributorRole && (
-                      <Link href={"/books/upload"}>
+                      <Link href={"/books/upload"} passHref>
                         <button
                           type="button"
                           className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lightGreen  hover:bg-deepGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -719,7 +728,7 @@ const Sidebar = (props) => {
                     )}
                     {/* {status === "authenticated" && session.user.name === "tsegay" && ( */}
                     {adminRole && (
-                      <Link href={"/publish"}>
+                      <Link href={"/publish"} passHref>
                         <button
                           type="button"
                           className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lightGreen hover:bg-deepGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"

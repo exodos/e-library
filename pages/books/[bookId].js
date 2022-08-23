@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import prisma from "../../utils/prisma";
 import Head from "next/head";
 import Image from "next/image";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -12,11 +11,16 @@ import { useState } from "react";
 import { getSession } from "next-auth/react";
 import { baseUrl } from "../../client/config";
 import { UserContext } from "../../store/user-context";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 const BookDetails = ({ selectedBook }) => {
   const { user } = useContext(UserContext);
+
+  // const [pdfFile, setPdfFile] = useState(selectedBook.bookUrl);
+
   if (!user) {
     return "Loading";
   }
@@ -27,8 +31,7 @@ const BookDetails = ({ selectedBook }) => {
     return <Custom404 />;
   }
 
-  const [pdfFile, setPdfFile] = useState(selectedBook.bookUrl);
-
+  const pdfFile = selectedBook.bookUrl;
   const handleRead = async (book) => {
     const bookId = book;
     const userId = user.oracleId;
@@ -290,7 +293,7 @@ const BookDetails = ({ selectedBook }) => {
                   />
                   Download
                 </button>
-                <Link href={`/${selectedBook.id}`}>
+                <Link href={`/${selectedBook.id}`} passHref>
                   <button
                     className="flex ml-14 text-white bg-lightBlue border-0 py-2 px-6 focus:outline-none hover:bg-deepBlue rounded"
                     onClick={() => handleRead(selectedBook.id)}
@@ -323,8 +326,13 @@ const BookDetails = ({ selectedBook }) => {
   );
 };
 
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
   if (!session) {
     return {
       redirect: {
@@ -334,15 +342,16 @@ export const getServerSideProps = async (ctx) => {
     };
   }
 
-  const { params } = ctx;
+  const { params } = context;
+  const bookId = parseInt(params.bookId);
 
   let selectedBook = null;
   try {
-    selectedBook = await prisma.Book.findUnique({
-      where: {
-        id: parseInt(params.bookId),
-      },
-    });
+    const res = await fetch(baseUrl + `/book/fetch-book?bookId=${bookId}`);
+    if (res.status !== 200) {
+      throw new Error("Could not get books with that Id");
+    }
+    selectedBook = await res.json();
   } catch (err) {
     console.log(err.message);
   }

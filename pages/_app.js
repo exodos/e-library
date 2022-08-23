@@ -21,7 +21,7 @@ export default function App({
   const router = useRouter();
   if (router.pathname.startsWith("/auth/sign-in")) {
     return (
-      <SessionProvider session={session}>
+      <SessionProvider session={session} refetchInterval={5 * 60}>
         <UserContext.Provider value={value}>
           <NotificationContextProvider>
             <Hero>
@@ -44,7 +44,7 @@ export default function App({
     );
   }
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={session} refetchInterval={5 * 60}>
       <UserContext.Provider value={value}>
         <NotificationContextProvider>
           <Layout>

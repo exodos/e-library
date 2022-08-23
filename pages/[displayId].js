@@ -11,9 +11,9 @@ const BookViewer = dynamic(() => import("../components/books/book-viewer"), {
 });
 
 const BookPdfDisplay = ({ selectedBook }) => {
-  if (!selectedBook) {
-    return <Custom404 />;
-  }
+  // if (!selectedBook) {
+  //   return <Custom404 />;
+  // }
 
   // console.log({ session });
 

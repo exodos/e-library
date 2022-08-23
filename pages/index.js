@@ -1,17 +1,18 @@
 import Head from "next/head";
 import { baseUrl } from "../client/config";
 import BookList from "../components/books/book-list";
-import { getSession } from "next-auth/react";
 import { useContext } from "react";
 import { UserContext } from "../store/user-context";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 const Home = ({ bookData }) => {
   const { user } = useContext(UserContext);
+
   if (!user) {
     return "Loading";
   }
-  const userId = user.oracleId;
-  // console.log(userId);
+  // const userId = user.oracleId;
   return (
     <>
       <Head>
@@ -33,8 +34,13 @@ const Home = ({ bookData }) => {
   );
 };
 
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
+export const getServerSideProps = async (context) => {
+  // const session = await getSession(ctx);
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
   if (!session) {
     return {
       redirect: {
@@ -44,7 +50,7 @@ export const getServerSideProps = async (ctx) => {
     };
   }
 
-  const { query } = ctx;
+  const { query } = context;
 
   const page = query.page || 1;
   const searchBook = query.search;

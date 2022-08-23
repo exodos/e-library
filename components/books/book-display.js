@@ -5,7 +5,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 const BookDisplay = (props) => {
   const { pdf } = props;
-  //   const [file, setFile] = useState("./simple.pdf");
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 

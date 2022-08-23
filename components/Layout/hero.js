@@ -31,6 +31,7 @@ const Hero = ({ children }) => {
                   height={234}
                 />
               </div>
+
               <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
                 <p className="text-base text-gray-400">
                   &copy; 2022 ethio telecom. All rights reserved
