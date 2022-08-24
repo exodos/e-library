@@ -18,11 +18,11 @@ model User {
   fullName   String    @map("full_name")
   jobRole    String?   @map("job_role")
   email      String    @unique
+  password   String
   division   String?
   department String?
   role       Role      @default(USER)
   visitors   Visitor[]
-
 
   @@map("users")
 }
@@ -70,7 +70,6 @@ model Catalogue {
   rawNumber     Int
   createdAt     DateTime @default(now()) @db.Date
   updatedAt     DateTime @default(now()) @db.Date
-
 
   @@map("catalogues")
 }

@@ -1,10 +1,15 @@
 import prisma from "../../../../utils/prisma";
+
 const handler = async (req, res) => {
   const publishId = req.query.publishId;
+  console.log(
+    "🚀 ~ file: [publishId].js ~ line 5 ~ handler ~ publishId",
+    publishId
+  );
   try {
     const result = await prisma.Book.findUnique({
       where: {
-        id: parseInt(bookId),
+        id: parseInt(publishId),
       },
     });
 

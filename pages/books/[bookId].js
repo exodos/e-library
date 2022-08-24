@@ -347,7 +347,7 @@ export const getServerSideProps = async (context) => {
 
   let selectedBook = null;
   try {
-    const res = await fetch(baseUrl + `/book/fetch-book?bookId=${bookId}`);
+    const res = await fetch(baseUrl + `/book/fetch-book/${bookId}`);
     if (res.status !== 200) {
       throw new Error("Could not get books with that Id");
     }

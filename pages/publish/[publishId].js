@@ -1,6 +1,4 @@
 import React from "react";
-// import { PrismaClient } from "@prisma/client";
-import prisma from "../../utils/prisma";
 import Head from "next/head";
 import Image from "next/image";
 import Router from "next/router";
@@ -14,8 +12,6 @@ import {
   PencilAltIcon,
 } from "@heroicons/react/solid";
 import EditBook from "../../components/books/edit-book";
-import { getSession } from "next-auth/react";
-import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
 import { unstable_getServerSession } from "next-auth";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
@@ -220,13 +216,12 @@ export const getServerSideProps = async (context) => {
   }
 
   const { params } = context;
-  const publishId = params.publishId;
+  const publishId = parseInt(params.publishId);
   let publish = null;
 
   try {
-    const res = await fetch(
-      baseUrl + `/publish/fetch-publish?publishId=${publishId}`
-    );
+    const res = await fetch(baseUrl + `/publish/fetch-publish/${publishId}`);
+
     if (res.status !== 200) {
       throw new Error("Error fetching books");
     }

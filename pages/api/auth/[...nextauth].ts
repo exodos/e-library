@@ -1,152 +1,66 @@
-const ldap = require("ldapjs");
 import NextAuth, { NextAuthOptions } from "next-auth";
+// import type { NextAuthOptions } from "next-auth";
+// import CredentialsProvider from "next-auth/providers/credentials";
+import Credentials from "next-auth/providers/credentials";
 
-import CredentialsProvider from "next-auth/providers/credentials";
+// import prisma from "../../../helper/prisma";
 import prisma from "../../../utils/prisma";
-
-const url = `ldap://${process.env.LDAP_SERVER}`;
+import { verifyPassword } from "../../../lib/auth";
+let userAccount = null;
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    CredentialsProvider({
-      name: "LDAP",
+    Credentials({
       credentials: {
-        username: { label: "DN", type: "text", placeholder: "" },
-        password: { label: "Password", type: "password" },
+        username: { label: "username", type: "text" },
+        password: { label: "password", type: "password" },
       },
-      authorize: async (credentials, req) => {
-        // You might want to pull this call out so we're not making a new LDAP client on every login attemp
-        const client = ldap.createClient({
-          url: url,
-        });
-
-        return new Promise((resolve, reject) => {
-          client.bind(
-            `${credentials.username}@${process.env.LDAP_DOMAIN}`,
-            credentials.password,
-            (error: any) => {
-              if (error) {
-                console.log(error);
-                reject("Wrong email or password.");
-              }
-              const filter = `(sAMAccountName=${credentials.username})`;
-
-              client.search(
-                process.env.LDAP_BASE_DN,
-                {
-                  filter,
-                  scope: "sub",
-                  attributes: [
-                    "mail",
-                    "employeeid",
-                    "title",
-                    "name",
-                    "division",
-                    "department",
-                    "section",
-                  ],
-                },
-                (err, results) => {
-                  if (err) {
-                    reject(`User ${credentials.username} LDAP search error`);
-                  }
-
-                  const entries = [];
-
-                  results.on("searchEntry", (entry) => {
-                    entries.push(entry.object);
-                  });
-
-                  results.on("error", (err) => {
-                    console.log(err);
-                    reject("LDAP SEARCH error");
-                  });
-
-                  results.on("end", async (result) => {
-                    if (entries.length == 0) {
-                      reject("Something went wrong. Please try again. (AD)");
-                    }
-
-                    const searchResult = JSON.stringify(entries[0]);
-                    const adEmployee = JSON.parse(searchResult);
-                    const empId = adEmployee?.employeeID;
-                    const fullName = adEmployee.name;
-                    const jobRole = adEmployee?.title;
-                    const [arrayRole] = jobRole.split(" ").slice(-1);
-                    const email = adEmployee?.mail;
-                    const division = adEmployee?.division;
-                    const department = adEmployee?.department;
-                    let user = null;
-                    let role = "USER";
-                    try {
-                      const checkUser = await prisma.User.findUnique({
-                        where: {
-                          oracleId: parseInt(empId),
-                        },
-                      });
-
-                      if (!checkUser) {
-                        if (
-                          arrayRole === "Officer" ||
-                          arrayRole === "Director"
-                        ) {
-                          role = "CONTRIBUTOR";
-                        }
-
-                        user = await prisma.User.create({
-                          data: {
-                            oracleId: parseInt(empId),
-                            userName: credentials.username,
-                            fullName: fullName,
-                            jobRole: jobRole,
-                            email: email,
-                            division: division,
-                            department: department,
-                            role: role,
-                          },
-                        });
-                      } else {
-                        user = checkUser;
-                      }
-                      resolve(user);
-                    } catch (err) {
-                      console.log(err);
-                    }
-                  });
-                }
-              );
+      authorize: async (credentials) => {
+        try {
+          const user = await prisma.user.findFirst({
+            where: {
+              userName: credentials?.username,
+            },
+          });
+          if (user) {
+            const isValid = await verifyPassword(
+              credentials?.password,
+              user.password
+            );
+            if (isValid) {
+              return user;
+            } else {
+              console.log("Hash Not Matched To Logging In");
+              return null;
             }
-          );
-        });
+          } else {
+            return null;
+          }
+        } catch (err) {
+          console.log("Authorization error: ", err);
+        }
       },
     }),
   ],
-
   pages: {
     signIn: "/auth/sign-in",
-    error: "/auth/sign-in",
   },
   callbacks: {
     jwt: async ({ token, user }) => {
-      const isSignIn = user ? true : false;
-      if (isSignIn) {
+      if (user) {
         token.id = user.oracleId;
-        token.username = user.username;
-        token.password = user.password;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+        token.email = user.email;
+        token.role = user.role;
       }
+
       return token;
     },
     session: async ({ session, token }) => {
-      if (token) {
-        session.id = token.id;
-        session.username = token.username;
-        session.password = token.password;
-      }
-      return session;
-      // return { ...session, user: { username: token.username } };
+      return { ...session, user: token };
     },
   },
-
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
