@@ -124,7 +124,7 @@ const UploadBooks = () => {
     }));
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     try {
       notificationCtx.showNotification({
         title: "Upload Book",
@@ -137,7 +137,7 @@ const UploadBooks = () => {
         formData.append(key, value);
       });
 
-      fetch(baseUrl + `/book/create`, {
+      await fetch(baseUrl + `/book/create`, {
         method: "POST",
         body: formData,
       })
@@ -167,7 +167,7 @@ const UploadBooks = () => {
             status: "error",
           });
         });
-      Router.push("/");
+      await Router.push("/");
     } catch (err) {
       console.error(err);
       notificationCtx.showNotification({

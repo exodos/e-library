@@ -2,9 +2,9 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import Head from "next/head";
-import prisma from "../utils/prisma";
 import Custom404 from "./404";
 import { getSession } from "next-auth/react";
+import { baseUrl } from "../client/config";
 
 const BookViewer = dynamic(() => import("../components/books/book-viewer"), {
   ssr: false,
@@ -53,15 +53,16 @@ export const getServerSideProps = async (ctx) => {
 
   const { params } = ctx;
   let selectedBook = null;
+  const displayId = parseInt(params.displayId);
 
   try {
-    selectedBook = await prisma.Book.findUnique({
-      where: {
-        id: parseInt(params.displayId),
-      },
-    });
+    const res = await fetch(baseUrl + `/display/display-pdf/${displayId}`);
+    if (res.status !== 200) {
+      throw new Error("Could not get books with that Id");
+    }
+    selectedBook = await res.json();
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
   }
 
   return {

@@ -4,8 +4,6 @@ import path from "path";
 import prisma from "../../../utils/prisma";
 import { fromPath } from "pdf2pic";
 
-import { getSession } from "next-auth/react";
-
 export const config = {
   api: {
     bodyParser: false,

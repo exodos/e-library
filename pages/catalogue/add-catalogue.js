@@ -5,17 +5,20 @@ import Router from "next/router";
 import Link from "next/link";
 import NotificationContext from "../../store/notification-context";
 import { baseUrl } from "../../client/config";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { getSession } from "next-auth/react";
-import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
 import { unstable_getServerSession } from "next-auth";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
 
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+
 const AddCatalogue = () => {
   const { user } = useContext(UserContext);
+  const [formValues, setFormValues] = useState(null);
+
   const [query, setQuery] = useState({
     bookTitle: "",
     bookYear: "",
@@ -24,6 +27,32 @@ const AddCatalogue = () => {
     bookIsbn: "",
     shelfNumber: "",
     rawNumber: "",
+  });
+
+  const initialValues = {
+    bookTitle: "",
+    bookYear: "",
+    bookAuthor: "",
+    bookPublisher: "",
+    bookIsbn: "",
+    shelfNumber: "",
+    rawNumber: "",
+  };
+
+  const validate = Yup.object().shape({
+    bookTitle: Yup.string().required("Book Title Is Required"),
+    bookYear: Yup.number()
+      .required("Book Year Is Required")
+      .typeError("You Must Specify A Number"),
+    bookAuthor: Yup.string().required("Book Author Is Required"),
+    bookPublisher: Yup.string().required("Book Publisher Is Required"),
+    bookIsbn: Yup.string().required("Book ISBN Is Required"),
+    shelfNumber: Yup.number()
+      .required("Shelf Number Is Required")
+      .typeError("You Must Specify A Number"),
+    rawNumber: Yup.number()
+      .required("Raw Number Is Required")
+      .typeError("You Must Specify A Number"),
   });
 
   const validationSchema = Yup.object().shape({
