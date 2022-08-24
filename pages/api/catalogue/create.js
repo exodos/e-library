@@ -21,22 +21,6 @@ const handler = nc({
       next();
     }
   })
-  // .use(async (req, res, next) => {
-  //   const { shelfNumber, rawNumber } = req.body;
-  //   const check = await prisma.Catalogue.findFirst({
-  //     where: {
-  //       shelfNumber: parseInt(shelfNumber),
-  //       rawNumber: parseInt(rawNumber),
-  //     },
-  //   });
-  //   if (check) {
-  //     res
-  //       .status(403)
-  //       .json({ message: "Shelf Number And Raw Number Already Existed" });
-  //   } else {
-  //     next();
-  //   }
-  // })
   .post(async (req, res) => {
     const {
       bookTitle,

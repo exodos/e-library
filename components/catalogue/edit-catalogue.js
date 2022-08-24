@@ -8,9 +8,6 @@ import { UserContext } from "../../store/user-context";
 import { XIcon } from "@heroicons/react/solid";
 
 const EditCatalogue = ({ catalogue }) => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
-
   const { user } = useContext(UserContext);
 
   if (user && user.role !== "ADMIN") {
