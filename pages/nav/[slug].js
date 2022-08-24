@@ -88,12 +88,12 @@ const NavMenu = ({ bookData }) => {
             </div>
           )}
           {books?.length > 0 && (
-            <div className="text-deepBlue text-md font-semibold pt-1">
-              <span className="text-sm bg-yellow-400 text-gray-800">
-                Total Books:{" "}
-              </span>
-              <span className="text-sm bg-yellow-400 text-gray-800">
-                {bookData.totalBooks}
+            <div className="pt-2 pl-3">
+              <span className="font-medium text-gray-50 bg-lightBlue">
+                {Number(
+                  Math.round(bookData.totalBooks).toFixed(1)
+                ).toLocaleString()}{" "}
+                Books
               </span>{" "}
             </div>
           )}
