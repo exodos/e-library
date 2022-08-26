@@ -58,14 +58,14 @@ export const getServerSideProps = async (context) => {
 
   try {
     if (searchBook == null) {
-      const res = await fetch(baseUrl + `/book/pagination?page=${page}`);
+      const res = await fetch(baseUrl + `/api/book/pagination?page=${page}`);
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");
       }
       bookData = await res.json();
     } else {
       const res = await fetch(
-        baseUrl + `/book/pagination?page=${page}&search=${searchBook}`
+        baseUrl + `/api/book/pagination?page=${page}&search=${searchBook}`
       );
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");

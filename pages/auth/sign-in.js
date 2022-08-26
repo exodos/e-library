@@ -8,7 +8,6 @@ const SignIn = ({ csrfToken }) => {
   const { error } = useRouter().query;
   return (
     <>
-      {/* <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8"> */}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto pt-8">
           <Image
@@ -29,7 +28,7 @@ const SignIn = ({ csrfToken }) => {
           />
         </div>
       </div>
-      <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8 mt-20">
+      <div className="min-h-full flex flex-col justify-center py-5 sm:px-6 lg:px-8 mt-20">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Welcome to TExA e-Library

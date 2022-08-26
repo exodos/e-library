@@ -7,8 +7,6 @@ import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { UserContext } from "../../store/user-context";
 import { getSession } from "next-auth/react";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 const Publish = ({ bookData }) => {
   const { user } = useContext(UserContext);
@@ -29,13 +27,13 @@ const Publish = ({ bookData }) => {
     }
   }, [bookData]);
 
-  // if (!user) {
-  //   return "Loading";
-  // }
+  if (!user) {
+    return "Loading";
+  }
 
-  // if (user && user.role !== "ADMIN") {
-  //   router.push("/");
-  // }
+  if (user && user.role !== "ADMIN") {
+    router.push("/");
+  }
 
   const handlePaginate = (page) => {
     const path = router.pathname;
@@ -117,13 +115,9 @@ const Publish = ({ bookData }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
+
   if (!session) {
     return {
       redirect: {
@@ -133,7 +127,7 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { query } = context;
+  const { query } = ctx;
 
   const page = query.page || 1;
   const searchBook = query.search;
@@ -141,14 +135,14 @@ export const getServerSideProps = async (context) => {
 
   try {
     if (searchBook === undefined) {
-      const res = await fetch(baseUrl + `/publish/publish?page=${page}`);
+      const res = await fetch(baseUrl + `/api/publish/publish?page=${page}`);
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");
       }
       bookData = await res.json();
     } else {
       const res = await fetch(
-        baseUrl + `/publish/publish?page=${page}&search=${searchBook}`
+        baseUrl + `/api/publish/publish?page=${page}&search=${searchBook}`
       );
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");

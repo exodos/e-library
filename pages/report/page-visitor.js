@@ -2,12 +2,9 @@ import { SearchCircleIcon } from "@heroicons/react/solid";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import { useContext, useRef } from "react";
-import useSWR from "swr";
 import { baseUrl } from "../../client/config";
 import VisitedBooks from "../../components/report/visiter-book";
 import { UserContext } from "../../store/user-context";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 const PageVisitor = ({ visitorList }) => {
   const { user } = useContext(UserContext);
@@ -110,13 +107,8 @@ const PageVisitor = ({ visitorList }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
 
   if (!session) {
     return {
@@ -127,7 +119,7 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { query } = context;
+  const { query } = ctx;
 
   const page = query.page || 1;
   const searchBook = query.search;
@@ -141,7 +133,7 @@ export const getServerSideProps = async (context) => {
     if (searchBook != null) {
       const res = await fetch(
         baseUrl +
-          `/user-list/visitor-list/visitors?page=${page}&search=${searchBook}`
+          `/api/user-list/visitor-list/visitors?page=${page}&search=${searchBook}`
       );
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");
@@ -150,7 +142,7 @@ export const getServerSideProps = async (context) => {
     } else if (dateFrom != null && dateTo != null) {
       const res = await fetch(
         baseUrl +
-          `/user-list/visitor-list/visitors?page=${page}&dateFrom=${dateFrom}&dateTo=${dateTo}`
+          `/api/user-list/visitor-list/visitors?page=${page}&dateFrom=${dateFrom}&dateTo=${dateTo}`
       );
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");
@@ -158,7 +150,7 @@ export const getServerSideProps = async (context) => {
       visitorList = await res.json();
     } else {
       const res = await fetch(
-        baseUrl + `/user-list/visitor-list/visitors?page=${page}`
+        baseUrl + `/api/user-list/visitor-list/visitors?page=${page}`
       );
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");

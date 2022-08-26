@@ -1,11 +1,8 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-import prisma from "../../utils/prisma";
 import Custom404 from "../404";
 import { getSession } from "next-auth/react";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
 import { baseUrl } from "../../client/config";
 
 const BookViewer = dynamic(() => import("../../components/books/book-viewer"), {
@@ -37,13 +34,9 @@ const DisplayBook = ({ selectedBook }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
+
   if (!session) {
     return {
       redirect: {
@@ -53,12 +46,12 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { params } = context;
+  const { params } = ctx;
   const bookId = params.bookId;
 
   let selectedBook = null;
   try {
-    const res = await fetch(baseUrl + `/display/${bookId}`);
+    const res = await fetch(baseUrl + `/api/display/${bookId}`);
     if (res.status !== 200) {
       throw new Error("Could not get books with that Id");
     }

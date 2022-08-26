@@ -12,8 +12,6 @@ import * as Yup from "yup";
 import { getSession } from "next-auth/react";
 import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
-import { unstable_getServerSession } from "next-auth";
 
 const UploadBooks = () => {
   const { user } = useContext(UserContext);
@@ -137,7 +135,7 @@ const UploadBooks = () => {
         formData.append(key, value);
       });
 
-      await fetch(baseUrl + `/book/create`, {
+      await fetch(baseUrl + `/api/book/create`, {
         method: "POST",
         body: formData,
       })
@@ -523,13 +521,9 @@ const UploadBooks = () => {
     </>
   );
 };
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
+
   if (!session) {
     return {
       redirect: {

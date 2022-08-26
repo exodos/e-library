@@ -13,8 +13,7 @@ import {
 } from "@heroicons/react/solid";
 import EditBook from "../../components/books/edit-book";
 import { UserContext } from "../../store/user-context";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
+import { getSession } from "next-auth/react";
 
 const PublishDetails = (props) => {
   const { user } = useContext(UserContext);
@@ -44,7 +43,7 @@ const PublishDetails = (props) => {
   }
 
   const publishBook = async (id) => {
-    await fetch(baseUrl + `/publish/${id}`, {
+    await fetch(baseUrl + `/api/publish/${id}`, {
       method: "PUT",
     })
       .then((response) => {
@@ -199,13 +198,9 @@ const PublishDetails = (props) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
+
   if (!session) {
     return {
       redirect: {
@@ -215,12 +210,14 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { params } = context;
+  const { params } = ctx;
   const publishId = parseInt(params.publishId);
   let publish = null;
 
   try {
-    const res = await fetch(baseUrl + `/publish/fetch-publish/${publishId}`);
+    const res = await fetch(
+      baseUrl + `/api/publish/fetch-publish/${publishId}`
+    );
 
     if (res.status !== 200) {
       throw new Error("Error fetching books");

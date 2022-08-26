@@ -1,22 +1,23 @@
-import Document, { Html, Head, Main, NextScript } from "next/document";
-// import { Html, Head, Main, NextScript } from "next/document";
+// import Document, { Html, Head, Main, NextScript } from "next/document";
+import { Html, Head, Main, NextScript } from "next/document";
 import Favicon from "../components/Layout/favicon";
 
-// export default function Document() {
-//   return (
-//     <Html>
-//       <Head>
-//         <meta charSet="utf-8" />
-//         <Favicon />
-//       </Head>
-//       <body>
-//         <Main />
-//         <NextScript />
-//       </body>
-//     </Html>
-//   );
-// }
+export default function Document() {
+  return (
+    <Html>
+      <Head>
+        <meta charSet="utf-8" />
+        <Favicon />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
 
+/*
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
     const originalRenderPage = ctx.renderPage;
@@ -53,3 +54,5 @@ class MyDocument extends Document {
 }
 
 export default MyDocument;
+
+*/

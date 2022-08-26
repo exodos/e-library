@@ -56,7 +56,7 @@ export const getServerSideProps = async (ctx) => {
   const displayId = parseInt(params.displayId);
 
   try {
-    const res = await fetch(baseUrl + `/display/display-pdf/${displayId}`);
+    const res = await fetch(baseUrl + `/api/display/display-pdf/${displayId}`);
     if (res.status !== 200) {
       throw new Error("Could not get books with that Id");
     }

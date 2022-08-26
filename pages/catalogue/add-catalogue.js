@@ -6,14 +6,9 @@ import Link from "next/link";
 import NotificationContext from "../../store/notification-context";
 import { baseUrl } from "../../client/config";
 import { UserContext } from "../../store/user-context";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
-
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { getSession } from "next-auth/react";
 
 const AddCatalogue = () => {
   const { user } = useContext(UserContext);
@@ -52,15 +47,6 @@ const AddCatalogue = () => {
     allowed = true;
   }
 
-  const handleChange = () => (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setQuery((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
   const onSubmit = async (values) => {
     try {
       notificationCtx.showNotification({
@@ -69,7 +55,7 @@ const AddCatalogue = () => {
         status: "pending",
       });
 
-      fetch(baseUrl + `/catalogue/create`, {
+      fetch(baseUrl + `/api/catalogue/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
@@ -331,14 +317,8 @@ const AddCatalogue = () => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
 
   if (!session) {
     return {

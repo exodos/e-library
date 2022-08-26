@@ -1,14 +1,11 @@
-import { getSession, useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import { baseUrl } from "../../client/config";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import Link from "next/link";
 import CatalogueList from "../../components/catalogue/catalogue-list";
 import Head from "next/head";
-import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
-import { unstable_getServerSession } from "next-auth";
 
 const Catalogue = ({ catalogueData }) => {
   const { user } = useContext(UserContext);
@@ -64,13 +61,8 @@ const Catalogue = ({ catalogueData }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
 
   if (!session) {
     return {
@@ -81,7 +73,7 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { query } = context;
+  const { query } = ctx;
 
   const page = query.page || 1;
   const searchCatalogue = query.search;
@@ -89,14 +81,17 @@ export const getServerSideProps = async (context) => {
 
   try {
     if (searchCatalogue == null) {
-      const res = await fetch(baseUrl + `/catalogue/pagination?page=${page}`);
+      const res = await fetch(
+        baseUrl + `/api/catalogue/pagination?page=${page}`
+      );
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");
       }
       catalogueData = await res.json();
     } else {
       const res = await fetch(
-        baseUrl + `/catalogue/pagination?page=${page}&search=${searchCatalogue}`
+        baseUrl +
+          `/api/catalogue/pagination?page=${page}&search=${searchCatalogue}`
       );
       if (res.status !== 200) {
         throw new Error("Failed To Fetch");

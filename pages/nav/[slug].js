@@ -2,13 +2,11 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import UserList from "../../components/users/user-list";
+// import UserList from "../../components/users/user-list";
 import { baseUrl } from "../../client/config";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { getSession } from "next-auth/react";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 const NavMenu = ({ bookData }) => {
   const router = useRouter();
@@ -130,14 +128,9 @@ const NavMenu = ({ bookData }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
 
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
   if (!session) {
     return {
       redirect: {
@@ -147,7 +140,7 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { query } = context;
+  const { query } = ctx;
 
   const slug = query.slug;
   const page = query.page || 1;
@@ -155,7 +148,7 @@ export const getServerSideProps = async (context) => {
 
   try {
     const res = await fetch(
-      baseUrl + `/book/nav_pag?slug=${slug}&page=${page}`
+      baseUrl + `/api/book/nav_pag?slug=${slug}&page=${page}`
     );
     if (res.status !== 200) {
       throw new Error("Failed To Fetch");

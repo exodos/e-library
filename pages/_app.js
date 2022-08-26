@@ -7,7 +7,6 @@ import { SessionProvider } from "next-auth/react";
 import { useRouter } from "next/router";
 import Hero from "../components/Layout/hero";
 import useSWR from "swr";
-import { baseUrl } from "../client/config";
 import { UserContext } from "../store/user-context";
 
 export default function App({
@@ -15,7 +14,7 @@ export default function App({
   pageProps: { session, ...pageProps },
 }) {
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
+  const { data: user } = useSWR("/api/user-list/users", fetcher);
   const value = { user };
 
   const router = useRouter();

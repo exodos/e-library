@@ -4,15 +4,14 @@ import Image from "next/image";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerSrc from "../../pdf-worker";
 import { DocumentDownloadIcon, ViewGridIcon } from "@heroicons/react/solid";
-// import { jsPDF } from "jspdf";
 import Custom404 from "../404";
 import Link from "next/link";
-import { useState } from "react";
 import { getSession } from "next-auth/react";
 import { baseUrl } from "../../client/config";
 import { UserContext } from "../../store/user-context";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
+
+// import { unstable_getServerSession } from "next-auth";
+// import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -38,7 +37,7 @@ const BookDetails = ({ selectedBook }) => {
 
     try {
       const found = await fetch(
-        baseUrl + `/book-read/visitors?book=${bookId}&user=${userId}`
+        baseUrl + `/api/book-read/visitors?book=${bookId}&user=${userId}`
       );
 
       if (found.status !== 200) {
@@ -47,7 +46,7 @@ const BookDetails = ({ selectedBook }) => {
           userId,
         };
 
-        fetch(baseUrl + `/book-read/create`, {
+        fetch(baseUrl + `/api/book-read/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
@@ -68,7 +67,7 @@ const BookDetails = ({ selectedBook }) => {
 
     try {
       const found = await fetch(
-        baseUrl + `/book-read/visitors?book=${bookId}&user=${userId}`
+        baseUrl + `/api/book-read/visitors?book=${bookId}&user=${userId}`
       );
 
       if (found.status !== 200) {
@@ -77,7 +76,7 @@ const BookDetails = ({ selectedBook }) => {
           userId,
         };
 
-        fetch(baseUrl + `/book-read/create`, {
+        fetch(baseUrl + `/api/book-read/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
@@ -326,13 +325,9 @@ const BookDetails = ({ selectedBook }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
+
   if (!session) {
     return {
       redirect: {
@@ -342,12 +337,12 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { params } = context;
+  const { params } = ctx;
   const bookId = parseInt(params.bookId);
 
   let selectedBook = null;
   try {
-    const res = await fetch(baseUrl + `/book/fetch-book/${bookId}`);
+    const res = await fetch(baseUrl + `/api/book/fetch-book/${bookId}`);
     if (res.status !== 200) {
       throw new Error("Could not get books with that Id");
     }

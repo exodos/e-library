@@ -1,17 +1,12 @@
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
 import Head from "next/head";
 import { useContext } from "react";
-import { CSVLink } from "react-csv";
-import useSWR from "swr";
 import { baseUrl } from "../../client/config";
 import ExportReaders from "../../components/report/export-readers";
 import ExportVisitors from "../../components/report/export-visitors";
 import { UserContext } from "../../store/user-context";
+import { getSession } from "next-auth/react";
 
 const ReportExport = ({ visitorList }) => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
   const { user } = useContext(UserContext);
   if (!user) {
     return "Loading";
@@ -49,14 +44,8 @@ const ReportExport = ({ visitorList }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
 
   if (!session) {
     return {
@@ -70,7 +59,7 @@ export const getServerSideProps = async (context) => {
   let visitorList = null;
 
   try {
-    const res = await fetch(baseUrl + `/report/get-visitors`);
+    const res = await fetch(baseUrl + `/api/report/get-visitors`);
     if (res.status !== 200) {
       throw new Error("Failed To Fetch");
     }
