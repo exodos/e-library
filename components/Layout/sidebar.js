@@ -53,7 +53,7 @@ const navigation = [
         href: `/nav/Customer Experience And Quality Management`,
       },
       {
-        name: "TeXA",
+        name: "TExA",
         href: `/nav/Telecom Excellence Academy`,
       },
       { name: "Supply & Chain", href: `/nav/Supply And Chain` },

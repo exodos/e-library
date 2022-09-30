@@ -49,7 +49,7 @@ const EditBook = ({ publish }) => {
         message: "Editing Book Status",
         status: "pending",
       });
-      fetch(baseUrl + `/edit-save/${savePublish}`, {
+      fetch(baseUrl + `/api/edit-save/${savePublish}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -125,7 +125,7 @@ const EditBook = ({ publish }) => {
         message: "Editing Book Status",
         status: "pending",
       });
-      fetch(baseUrl + `/book/${editId}`, {
+      fetch(baseUrl + `/api/book/${editId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

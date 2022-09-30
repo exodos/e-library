@@ -55,7 +55,7 @@ const EditCatalogue = ({ catalogue }) => {
         message: "Editing Catalogue Status",
         status: "pending",
       });
-      fetch(baseUrl + `/catalogue/${editId}`, {
+      fetch(baseUrl + `/api/catalogue/${editId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

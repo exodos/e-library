@@ -3,8 +3,7 @@ import { baseUrl } from "../client/config";
 import BookList from "../components/books/book-list";
 import { useContext } from "react";
 import { UserContext } from "../store/user-context";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "/pages/api/auth/[...nextauth]";
+import { getSession } from "next-auth/react";
 
 const Home = ({ bookData }) => {
   const { user } = useContext(UserContext);
@@ -34,13 +33,8 @@ const Home = ({ bookData }) => {
   );
 };
 
-export const getServerSideProps = async (context) => {
-  // const session = await getSession(ctx);
-  const session = await unstable_getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+export const getServerSideProps = async (ctx) => {
+  const session = await getSession(ctx);
   if (!session) {
     return {
       redirect: {
@@ -50,7 +44,7 @@ export const getServerSideProps = async (context) => {
     };
   }
 
-  const { query } = context;
+  const { query } = ctx;
 
   const page = query.page || 1;
   const searchBook = query.search;

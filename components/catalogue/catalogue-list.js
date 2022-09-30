@@ -2,11 +2,8 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/solid";
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import ReactPaginate from "react-paginate";
-import Link from "next/link";
 import DeleteCatalogue from "./delete-catalogue";
 import EditCatalogue from "./edit-catalogue";
-import useSWR from "swr";
-import { baseUrl } from "../../client/config";
 import { UserContext } from "../../store/user-context";
 
 const CatalogueList = ({ catalogueData }) => {

@@ -13,7 +13,7 @@ const DeleteBook = ({ publish }) => {
     setOpen(false);
     // console.log(publish.id);
 
-    await fetch(baseUrl + `/publish/${publish.id}`, {
+    await fetch(baseUrl + `/api/publish/${publish.id}`, {
       method: "DELETE",
     })
       .then((response) => {

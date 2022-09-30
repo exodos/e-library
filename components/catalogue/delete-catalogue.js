@@ -1,16 +1,11 @@
 import { Fragment, useContext, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
-import { baseUrl } from "../../client/config";
 import NotificationContext from "../../store/notification-context";
 import Router from "next/router";
-import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
 
 const DeleteCatalogue = ({ catalogue }) => {
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data: user } = useSWR(baseUrl + `/user-list/users`, fetcher);
-
   const { user } = useContext(UserContext);
 
   if (user && user.role !== "ADMIN") {
@@ -24,7 +19,7 @@ const DeleteCatalogue = ({ catalogue }) => {
     setOpen(false);
     // console.log(publish.id);
 
-    await fetch(baseUrl + `/catalogue/${catalogue.id}`, {
+    await fetch(baseUrl + `/api/catalogue/${catalogue.id}`, {
       method: "DELETE",
     })
       .then((response) => {

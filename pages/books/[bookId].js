@@ -10,9 +10,6 @@ import { getSession } from "next-auth/react";
 import { baseUrl } from "../../client/config";
 import { UserContext } from "../../store/user-context";
 
-// import { unstable_getServerSession } from "next-auth";
-// import { authOptions } from "/pages/api/auth/[...nextauth]";
-
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 const BookDetails = ({ selectedBook }) => {
@@ -92,50 +89,28 @@ const BookDetails = ({ selectedBook }) => {
   };
 
   const downloadFile = () => {
-    // fetch(pdfFile, {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-Type": "application/pdf",
-    //   },
-    // })
-    //   .then((response) => response.blob())
-    //   .then((response) => {
-    //     let blob = response;
-    //     let reader = new window.FileReader();
-    //     reader.readAsDataURL(blob);
-    //     reader.onload = function () {
-    //       let base64data = reader.result;
-    //       window.open(base64data);
-    //     };
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-
-    fetch(pdfFile, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/pdf",
-      },
-    })
-      .then((response) => response.blob())
-      .then((blob) => {
-        // Create blob link to download
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", `${selectedBook.bookTitle}`);
-
-        // Append to html link element page
-        document.body.appendChild(link);
-
-        // Start download
-        link.click();
-
-        // Clean up and remove the link
-        link.parentNode.removeChild(link);
-      });
+    window.open(pdfFile, "_blank");
   };
+
+  // const downloadFile = () => {
+  //   fetch(pdfFile, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/pdf",
+  //     },
+  //   })
+  //     .then((response) => response.blob())
+  //     .then((blob) => {
+  //       const url = window.URL.createObjectURL(new Blob([blob]));
+  //       const link = document.createElement("a");
+  //       link.href = url;
+  //       link.setAttribute("download", `${selectedBook.bookTitle}`);
+  //       document.body.appendChild(link);
+  //       link.click();
+
+  //       link.parentNode.removeChild(link);
+  //     });
+  // };
 
   return (
     <>
