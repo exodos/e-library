@@ -3,22 +3,34 @@ import Head from "next/head";
 import Image from "next/image";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerSrc from "../../pdf-worker";
-import { DocumentDownloadIcon, ViewGridIcon } from "@heroicons/react/solid";
+import {
+  DocumentDownloadIcon,
+  ViewGridIcon,
+  TrashIcon,
+} from "@heroicons/react/solid";
 import Custom404 from "../404";
 import Link from "next/link";
 import { getSession } from "next-auth/react";
 import { baseUrl } from "../../client/config";
 import { UserContext } from "../../store/user-context";
+import NotificationContext from "../../store/notification-context";
+import Router from "next/router";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 const BookDetails = ({ selectedBook }) => {
   const { user } = useContext(UserContext);
+  const notificationCtx = useContext(NotificationContext);
 
   // const [pdfFile, setPdfFile] = useState(selectedBook.bookUrl);
 
   if (!user) {
     return "Loading";
+  }
+  let allowed = false;
+
+  if (user && user.role === "ADMIN") {
+    allowed = true;
   }
 
   // console.log({ user });
@@ -28,6 +40,7 @@ const BookDetails = ({ selectedBook }) => {
   }
 
   const pdfFile = selectedBook.bookUrl;
+
   const handleRead = async (book) => {
     const bookId = book;
     const userId = user.oracleId;
@@ -90,6 +103,39 @@ const BookDetails = ({ selectedBook }) => {
 
   const downloadFile = () => {
     window.open(pdfFile, "_blank");
+  };
+
+  const handleUnPublish = async (id) => {
+    await fetch(baseUrl + `/api/book/unpublish/${id}`, {
+      method: "PUT",
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        response.json().then((data) => {
+          notificationCtx.showNotification({
+            title: "Error",
+            message: `${data.message} || 'Something Went Wrong'`,
+            status: "error",
+          });
+        });
+      })
+      .then((data) => {
+        notificationCtx.showNotification({
+          title: "Success!",
+          message: "Successfully Change Vehicle Status",
+          status: "success",
+        });
+      })
+      .catch((error) => {
+        notificationCtx.showNotification({
+          title: "Error!",
+          message: error.message || "Something Went Wrong",
+          status: "error",
+        });
+      });
+    await Router.push("/");
   };
 
   // const downloadFile = () => {
@@ -254,7 +300,7 @@ const BookDetails = ({ selectedBook }) => {
 
               <div className="flex">
                 <button
-                  className="flex ml-10  text-white bg-lightGreen border-0 py-2 px-6 focus:outline-none hover:bg-deepGreen rounded"
+                  className="flex ml-8  text-white bg-lightGreen border-0 py-2 px-3 focus:outline-none hover:bg-deepGreen rounded"
                   // onClick={downloadFile}
                   onClick={() => {
                     downloadFile();
@@ -269,7 +315,7 @@ const BookDetails = ({ selectedBook }) => {
                 </button>
                 <Link href={`/${selectedBook.id}`} passHref>
                   <button
-                    className="flex ml-14 text-white bg-lightBlue border-0 py-2 px-6 focus:outline-none hover:bg-deepBlue rounded"
+                    className="flex ml-8 text-white bg-lightBlue border-0 py-2 px-5 focus:outline-none hover:bg-deepBlue rounded"
                     onClick={() => handleRead(selectedBook.id)}
                   >
                     <ViewGridIcon
@@ -279,6 +325,19 @@ const BookDetails = ({ selectedBook }) => {
                     Read
                   </button>
                 </Link>
+
+                {allowed && (
+                  <button
+                    className="flex ml-8 text-white bg-lightBlue border-0 py-2 px-3 focus:outline-none hover:bg-deepBlue rounded"
+                    onClick={() => handleUnPublish(selectedBook.id)}
+                  >
+                    <TrashIcon
+                      className="flex-shrink-0 mr-1.5 h-5 w-5 text-white"
+                      aria-hidden="true"
+                    />
+                    unpublish
+                  </button>
+                )}
                 <button className="rounded-full w-10 h-10 bg-eRed p-0 border-0 inline-flex items-center justify-center text-white ml-10">
                   <svg
                     fill="currentColor"
