@@ -26,10 +26,6 @@ const PublishDetails = (props) => {
     return "Loading";
   }
 
-  if (user && user.role !== "ADMIN") {
-    Router.push("/");
-  }
-
   if (!publish) {
     return (
       <section className="text-gray-700 body-font overflow-hidden">
@@ -78,8 +74,8 @@ const PublishDetails = (props) => {
   return (
     <>
       <Head>
-        <title>{publish.bookTitle}</title>
-        <meta name="description" content={publish.bookCategory} />
+        <title>{publish?.bookTitle}</title>
+        <meta name="description" content={publish?.bookCategory} />
       </Head>
       <section className="text-gray-700 body-font overflow-hidden bg-gray-100">
         <div className="container px-5 py-5 mx-auto">
@@ -87,7 +83,7 @@ const PublishDetails = (props) => {
             {/* <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0"> */}
             <div className="lg:h-auto lg:w-50 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden py-10">
               <Image
-                src={`/book-images/${publish.bookThumb}`}
+                src={`/book-images/${publish?.bookThumb}`}
                 alt={publish.bookTitle}
                 width={400}
                 height={600}
@@ -100,14 +96,14 @@ const PublishDetails = (props) => {
               <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">
                 {publish.bookTitle}
               </h1>
-              <p className="leading-relaxed">{publish.bookDescription}</p>
+              <p className="leading-relaxed">{publish?.bookDescription}</p>
               <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-200 mb-5">
                 <div className="flex">
                   <h2 className="text-sm title-font text-gray-500 tracking-widest mr-5">
                     Published Year:
                   </h2>
                   <h1 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {publish.bookYear}
+                    {publish?.bookYear}
                   </h1>
                 </div>
                 <div className="flex ml-6 items-center">
@@ -115,7 +111,7 @@ const PublishDetails = (props) => {
                     Author:
                   </h2>
                   <h2 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {publish.bookAuthor}
+                    {publish?.bookAuthor}
                   </h2>
                 </div>
               </div>
@@ -125,7 +121,7 @@ const PublishDetails = (props) => {
                     Publisher:
                   </h2>
                   <h1 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {publish.bookPublisher}
+                    {publish?.bookPublisher}
                   </h1>
                 </div>
                 <div className="flex ml-6 items-center">
@@ -133,7 +129,7 @@ const PublishDetails = (props) => {
                     ISBN:
                   </h2>
                   <h2 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {publish.bookIsbn}
+                    {publish?.bookIsbn}
                   </h2>
                 </div>
               </div>
@@ -143,7 +139,7 @@ const PublishDetails = (props) => {
                     Recommended By:
                   </h2>
                   <h1 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {publish.bookRecommendedBy}
+                    {publish?.bookRecommendedBy}
                   </h1>
                 </div>
                 <div className="flex ml-6 items-center">
@@ -151,14 +147,14 @@ const PublishDetails = (props) => {
                     Category:
                   </h2>
                   <h2 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {publish.bookCategory}
+                    {publish?.bookCategory}
                   </h2>
                 </div>
               </div>
               <div className="flex">
                 <button
                   className="flex ml-10 lg:ml-8  text-white bg-lightGreen border-0 py-2 px-6 focus:outline-none hover:bg-deepGreen rounded"
-                  onClick={() => publishBook(publish.id)}
+                  onClick={() => publishBook(publish?.id)}
                 >
                   <CheckCircleIcon
                     className="flex-shrink-0 mr-1.5 h-5 w-5 text-white"
@@ -206,6 +202,13 @@ export const getServerSideProps = async (ctx) => {
       redirect: {
         permanent: false,
         destination: "/auth/sign-in",
+      },
+    };
+  } else if (session?.user?.role === "USER") {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/",
       },
     };
   }

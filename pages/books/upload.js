@@ -1,57 +1,64 @@
 import React from "react";
 import Head from "next/head";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import Router, { useRouter } from "next/router";
-import { createBook } from "../../client/request";
 import Link from "next/link";
 import NotificationContext from "../../store/notification-context";
 import { baseUrl } from "../../client/config";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 import { getSession } from "next-auth/react";
-import useSWR from "swr";
 import { UserContext } from "../../store/user-context";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { objectToFormData } from "../../utils";
+import { useForm } from "react-hook-form";
+
+const MAX_UPLOAD_SIZE = 1024 * 1024 * 10;
 
 const UploadBooks = () => {
   const { user } = useContext(UserContext);
   const router = useRouter();
 
-  const [query, setQuery] = useState({
-    bookTitle: "",
-    bookDescription: "",
-    bookYear: "",
-    bookAuthor: "",
-    bookPublisher: "",
-    bookIsbn: "",
-    bookRecommendedBy: "",
-    bookCategory: "",
-    file: "",
-  });
-
-  const validationSchema = Yup.object().shape({
-    bookTitle: Yup.string().required("Book Title Is Required"),
-    bookDescription: Yup.string().required("Book Description Is Required"),
-    bookYear: Yup.number()
-      .required("Book Year Is Required")
-      .typeError("You Must Specify A Number"),
-    bookAuthor: Yup.string().required("Book Author Is Required"),
-    bookPublisher: Yup.string().required("Book Publisher Is Required"),
-    bookIsbn: Yup.string().required("Book ISBN Is Required"),
-    bookRecommendedBy: Yup.string().required("Book Recommended By Is Required"),
-    bookCategory: Yup.string().required("Book Category Is Required"),
-    file: Yup.mixed()
-      .required("You Need To Provide File")
-      .test("required", "File To Upload Is Required", (value) => {
-        return value && value.length;
+  const validationSchema = z.object({
+    bookTitle: z.string().min(1, { message: "Book Title is required" }),
+    bookDescription: z
+      .string()
+      .min(1, { message: "Book Description is required" }),
+    bookYear: z
+      .number()
+      .refine((value) => value > 0, { message: "Book Year is required" }),
+    bookAuthor: z.string().min(1, { message: "Book Author is required" }),
+    bookPublisher: z.string().min(1, { message: "Book Publisher is required" }),
+    bookIsbn: z.string().min(1, { message: "Book ISBN is required" }),
+    bookRecommendedBy: z
+      .string()
+      .min(1, { message: "Book Recommended By is required" }),
+    bookCategory: z.string().min(1, { message: "Book Category is required" }),
+    file: z
+      .custom()
+      .transform((fileList) => fileList?.length > 0 && fileList.item(0))
+      .refine((file) => !file || (!!file && file.size <= MAX_UPLOAD_SIZE), {
+        message: "The property picture must be a maximum of 10MB.",
       }),
   });
 
-  const formOptions = { resolver: yupResolver(validationSchema) };
+  const schema = validationSchema;
 
-  // get functions to build form with useForm() hook
-  const { register, handleSubmit, formState } = useForm(formOptions);
-  const { errors } = formState;
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      bookTitle: "",
+      bookDescription: "",
+      bookYear: 0,
+      bookAuthor: "",
+      bookPublisher: "",
+      bookIsbn: "",
+      bookRecommendedBy: "",
+      bookCategory: "",
+      file: null,
+    },
+    // mode: "all",
+    mode: "onChange",
+  });
 
   const recommendedOptions = [
     { value: "Customer Service", label: "Customer Service" },
@@ -102,26 +109,6 @@ const UploadBooks = () => {
     return "Loading";
   }
 
-  if (user && user.role === "USER") {
-    router.push("/");
-  }
-
-  const handleFileChange = () => (e) => {
-    setQuery((prevState) => ({
-      ...prevState,
-      file: e.target.files[0],
-    }));
-  };
-
-  const handleChange = () => (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setQuery((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
   const onSubmit = async (data) => {
     try {
       notificationCtx.showNotification({
@@ -130,10 +117,8 @@ const UploadBooks = () => {
         status: "pending",
       });
 
-      const formData = new FormData();
-      Object.entries(query).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+      const { file } = data;
+      const formData = objectToFormData({ ...data, file: file });
 
       await fetch(baseUrl + `/api/book/create`, {
         method: "POST",
@@ -191,10 +176,8 @@ const UploadBooks = () => {
             <div className="container px-5 py-24 mx-auto">
               <form
                 className="space-y-8 divide-y divide-gray-200"
-                // acceptCharset="UTF-8"
-                // method="POST"
-                encType="multipart/form-data"
-                onSubmit={handleSubmit(onSubmit)}
+                method="POST"
+                onSubmit={form.handleSubmit(onSubmit)}
               >
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
@@ -218,19 +201,19 @@ const UploadBooks = () => {
                         <div className="mt-1 sm:mt-0 sm:col-span-2">
                           <div className="max-w-lg flex rounded-md shadow-sm">
                             <input
-                              {...register("bookTitle")}
+                              {...form.register("bookTitle")}
                               type="text"
                               className="flex-1 block w-full focus:ring-indigo-500 focus:border-indigo-500 min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                               id="bookTitle"
                               placeholder="Enter Book Title"
                               name="bookTitle"
-                              value={query.bookTitle}
-                              onChange={handleChange()}
                             />
                           </div>
                           <div className="text-eRed text-sm italic mt-2">
-                            {errors.bookTitle && (
-                              <span>{errors.bookTitle.message}</span>
+                            {form.formState.errors.bookTitle && (
+                              <span>
+                                {form.formState.errors.bookTitle.message}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -244,21 +227,21 @@ const UploadBooks = () => {
                         </label>
                         <div className="mt-1 sm:mt-0 sm:col-span-2">
                           <textarea
-                            {...register("bookDescription")}
+                            {...form.register("bookDescription")}
                             rows={3}
                             className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"
                             id="bookDescription"
                             placeholder="Enter Book Description"
                             name="bookDescription"
-                            // defaultValue={query.book_description}
-                            onChange={handleChange()}
                           />
                           <p className="mt-2 text-sm text-lightGreen">
                             Write a few sentences to describe the book.
                           </p>
                           <div className="text-eRed text-sm italic mt-2">
-                            {errors.bookDescription && (
-                              <span>{errors.bookDescription.message}</span>
+                            {form.formState.errors.bookDescription && (
+                              <span>
+                                {form.formState.errors.bookDescription.message}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -274,19 +257,19 @@ const UploadBooks = () => {
                         <div className="mt-1 sm:mt-0 sm:col-span-2">
                           <div className="max-w-lg flex rounded-md shadow-sm">
                             <input
-                              {...register("bookYear")}
+                              {...form.register("bookYear")}
                               type="number"
                               className="flex-1 block w-full focus:ring-indigo-500 focus:border-indigo-500 min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                               id="bookYear"
                               placeholder="Enter publisher year in format of yyyy"
                               name="bookYear"
-                              value={query.bookYear}
-                              onChange={handleChange()}
                             />
                           </div>
                           <div className="text-eRed text-sm italic mt-2">
-                            {errors.bookYear && (
-                              <span>{errors.bookYear.message}</span>
+                            {form.formState.errors.bookYear && (
+                              <span>
+                                {form.formState.errors.bookYear.message}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -301,19 +284,19 @@ const UploadBooks = () => {
                         <div className="mt-1 sm:mt-0 sm:col-span-2">
                           <div className="max-w-lg flex rounded-md shadow-sm">
                             <input
-                              {...register("bookAuthor")}
+                              {...form.register("bookAuthor")}
                               type="text"
                               className="flex-1 block w-full focus:ring-indigo-500 focus:border-indigo-500 min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                               id="bookAuthor"
                               placeholder="Enter Book Author"
                               name="bookAuthor"
-                              value={query.bookAuthor}
-                              onChange={handleChange()}
                             />
                           </div>
                           <div className="text-eRed text-sm italic mt-2">
-                            {errors.bookAuthor && (
-                              <span>{errors.bookAuthor.message}</span>
+                            {form.formState.errors.bookAuthor && (
+                              <span>
+                                {form.formState.errors.bookAuthor.message}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -328,19 +311,19 @@ const UploadBooks = () => {
                         <div className="mt-1 sm:mt-0 sm:col-span-2">
                           <div className="max-w-lg flex rounded-md shadow-sm">
                             <input
-                              {...register("bookPublisher")}
+                              {...form.register("bookPublisher")}
                               type="text"
                               className="flex-1 block w-full focus:ring-indigo-500 focus:border-indigo-500 min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                               id="bookPublisher"
                               placeholder="Enter Book Publisher"
                               name="bookPublisher"
-                              value={query.bookPublisher}
-                              onChange={handleChange()}
                             />
                           </div>
                           <div className="text-eRed text-sm italic mt-2">
-                            {errors.bookPublisher && (
-                              <span>{errors.bookPublisher.message}</span>
+                            {form.formState.errors.bookPublisher && (
+                              <span>
+                                {form.formState.errors.bookPublisher.message}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -355,19 +338,19 @@ const UploadBooks = () => {
                         <div className="mt-1 sm:mt-0 sm:col-span-2">
                           <div className="max-w-lg flex rounded-md shadow-sm">
                             <input
-                              {...register("bookIsbn")}
+                              {...form.register("bookIsbn")}
                               type="text"
                               className="flex-1 block w-full focus:ring-indigo-500 focus:border-indigo-500 min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                               id="bookIsbn"
                               placeholder="Enter Book ISBN"
                               name="bookIsbn"
-                              value={query.bookIsbn}
-                              onChange={handleChange()}
                             />
                           </div>
                           <div className="text-eRed text-sm italic mt-2">
-                            {errors.bookIsbn && (
-                              <span>{errors.bookIsbn.message}</span>
+                            {form.formState.errors.bookIsbn && (
+                              <span>
+                                {form.formState.errors.bookIsbn.message}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -383,10 +366,8 @@ const UploadBooks = () => {
                             </label>
                             <div className="mt-1 sm:mt-0 sm:col-span-2">
                               <select
-                                {...register("bookRecommendedBy")}
+                                {...form.register("bookRecommendedBy")}
                                 className="max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-                                value={query.bookRecommendedBy}
-                                onChange={handleChange()}
                                 id="bookRecommendedBy"
                                 name="bookRecommendedBy"
                                 // autoComplete={query.book_recommended_by}
@@ -404,9 +385,12 @@ const UploadBooks = () => {
                                 ))}
                               </select>
                               <div className="text-eRed text-sm italic mt-2">
-                                {errors.bookRecommendedBy && (
+                                {form.formState.errors.bookRecommendedBy && (
                                   <span>
-                                    {errors.bookRecommendedBy.message}
+                                    {
+                                      form.formState.errors.bookRecommendedBy
+                                        .message
+                                    }
                                   </span>
                                 )}
                               </div>
@@ -425,19 +409,19 @@ const UploadBooks = () => {
                       <div className="mt-1 sm:mt-0 sm:col-span-2">
                         <div className="max-w-lg flex rounded-md shadow-sm">
                           <input
-                            {...register("bookCategory")}
+                            {...form.register("bookCategory")}
                             type="text"
                             className="flex-1 block w-full focus:ring-indigo-500 focus:border-indigo-500 min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                             id="bookCategory"
                             placeholder="Enter Book Category"
                             name="bookCategory"
-                            value={query.bookCategory}
-                            onChange={handleChange()}
                           />
                         </div>
                         <div className="text-eRed text-sm italic mt-2">
-                          {errors.bookCategory && (
-                            <span>{errors.bookCategory.message}</span>
+                          {form.formState.errors.bookCategory && (
+                            <span>
+                              {form.formState.errors.bookCategory.message}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -475,13 +459,12 @@ const UploadBooks = () => {
                           >
                             <span>Upload a file</span>
                             <input
-                              {...register("file")}
+                              {...form.register("file")}
                               id="file"
                               name="file"
                               type="file"
                               accept=".pdf"
                               className="sr-only"
-                              onChange={handleFileChange()}
                             />
                           </label>
                           <p className="pl-1">or drag and drop</p>
@@ -490,7 +473,9 @@ const UploadBooks = () => {
                       </div>
                     </div>
                     <div className="flex text-eRed text-sm italic mt-2">
-                      {errors.file && <span>{errors.file.message}</span>}
+                      {form.formState.errors.file && (
+                        <span>{form.formState.errors.file.message}</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -529,6 +514,13 @@ export const getServerSideProps = async (ctx) => {
       redirect: {
         permanent: false,
         destination: "/auth/sign-in",
+      },
+    };
+  } else if (session?.user?.role === "USER") {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/",
       },
     };
   }

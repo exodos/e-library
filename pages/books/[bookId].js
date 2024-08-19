@@ -43,7 +43,7 @@ const BookDetails = ({ selectedBook }) => {
 
   const handleRead = async (book) => {
     const bookId = book;
-    const userId = user.oracleId;
+    const userId = user?.oracleId;
 
     try {
       const found = await fetch(
@@ -73,7 +73,7 @@ const BookDetails = ({ selectedBook }) => {
 
   const addVisitor = async (book) => {
     const bookId = book;
-    const userId = user.oracleId;
+    const userId = user?.oracleId;
 
     try {
       const found = await fetch(
@@ -137,26 +137,6 @@ const BookDetails = ({ selectedBook }) => {
       });
     await Router.push("/");
   };
-
-  // const downloadFile = () => {
-  //   fetch(pdfFile, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/pdf",
-  //     },
-  //   })
-  //     .then((response) => response.blob())
-  //     .then((blob) => {
-  //       const url = window.URL.createObjectURL(new Blob([blob]));
-  //       const link = document.createElement("a");
-  //       link.href = url;
-  //       link.setAttribute("download", `${selectedBook.bookTitle}`);
-  //       document.body.appendChild(link);
-  //       link.click();
-
-  //       link.parentNode.removeChild(link);
-  //     });
-  // };
 
   return (
     <>
@@ -242,14 +222,14 @@ const BookDetails = ({ selectedBook }) => {
                   </svg>
                 </span>
               </div>
-              <p className="leading-relaxed">{selectedBook.bookDescription}</p>
+              <p className="leading-relaxed">{selectedBook?.bookDescription}</p>
               <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-200 mb-5">
                 <div className="flex">
                   <h2 className="text-sm title-font text-gray-500 tracking-widest mr-5">
                     Published Year:
                   </h2>
                   <h1 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {selectedBook.bookYear}
+                    {selectedBook?.bookYear}
                   </h1>
                 </div>
                 <div className="flex ml-6 items-center">
@@ -257,7 +237,7 @@ const BookDetails = ({ selectedBook }) => {
                     Author:
                   </h2>
                   <h2 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {selectedBook.bookAuthor}
+                    {selectedBook?.bookAuthor}
                   </h2>
                 </div>
               </div>
@@ -267,7 +247,7 @@ const BookDetails = ({ selectedBook }) => {
                     Publisher:
                   </h2>
                   <h1 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {selectedBook.bookPublisher}
+                    {selectedBook?.bookPublisher}
                   </h1>
                 </div>
                 <div className="flex ml-6 items-center">
@@ -275,7 +255,7 @@ const BookDetails = ({ selectedBook }) => {
                     ISBN:
                   </h2>
                   <h2 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {selectedBook.bookIsbn}
+                    {selectedBook?.bookIsbn}
                   </h2>
                 </div>
               </div>
@@ -285,7 +265,7 @@ const BookDetails = ({ selectedBook }) => {
                     Recommended By:
                   </h2>
                   <h1 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {selectedBook.bookRecommendedBy}
+                    {selectedBook?.bookRecommendedBy}
                   </h1>
                 </div>
                 <div className="flex ml-6 items-center">
@@ -293,7 +273,7 @@ const BookDetails = ({ selectedBook }) => {
                     Category:
                   </h2>
                   <h2 className="text-gray-900 text-1xl title-font font-medium mb-1">
-                    {selectedBook.bookategory}
+                    {selectedBook?.bookategory}
                   </h2>
                 </div>
               </div>
@@ -304,7 +284,7 @@ const BookDetails = ({ selectedBook }) => {
                   // onClick={downloadFile}
                   onClick={() => {
                     downloadFile();
-                    addVisitor(selectedBook.id);
+                    addVisitor(selectedBook?.id);
                   }}
                 >
                   <DocumentDownloadIcon
@@ -313,10 +293,10 @@ const BookDetails = ({ selectedBook }) => {
                   />
                   Download
                 </button>
-                <Link href={`/${selectedBook.id}`} passHref>
+                <Link href={`/${selectedBook?.id}`} passHref>
                   <button
                     className="flex ml-8 text-white bg-lightBlue border-0 py-2 px-5 focus:outline-none hover:bg-deepBlue rounded"
-                    onClick={() => handleRead(selectedBook.id)}
+                    onClick={() => handleRead(selectedBook?.id)}
                   >
                     <ViewGridIcon
                       className="flex-shrink-0 mr-1.5 h-5 w-5 text-white"
@@ -329,7 +309,7 @@ const BookDetails = ({ selectedBook }) => {
                 {allowed && (
                   <button
                     className="flex ml-8 text-white bg-lightBlue border-0 py-2 px-3 focus:outline-none hover:bg-deepBlue rounded"
-                    onClick={() => handleUnPublish(selectedBook.id)}
+                    onClick={() => handleUnPublish(selectedBook?.id)}
                   >
                     <TrashIcon
                       className="flex-shrink-0 mr-1.5 h-5 w-5 text-white"

@@ -41,7 +41,8 @@
     "superjson": "^1.8.0",
     "swr": "^1.2.2",
     "tailwind-colors": "^1.1.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.2",
