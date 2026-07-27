@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import ReactPaginate from "react-paginate";
+import ReactPaginate from "../../utils/ReactPaginate";
 import { format } from "date-fns";
 
 const VisitedBooks = ({ visitorList }) => {
@@ -8,17 +8,8 @@ const VisitedBooks = ({ visitorList }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (visitorList) {
-      if (visitorList.error) {
-        return (
-          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue pt-5">
-            <h1 className="text-red-700">{visitorList.error}</h1>
-          </div>
-        );
-      } else {
-        setVisitors(visitorList.visitors);
-      }
-    }
+    if (!visitorList || visitorList.error) return;
+    setVisitors(visitorList.visitors || []);
   }, [visitorList]);
 
   const handlePaginate = (page) => {

@@ -6,17 +6,8 @@ const ExportReaders = ({ visitorList }) => {
   const [visitors, setVisitors] = useState([]);
 
   useEffect(() => {
-    if (visitorList) {
-      if (visitorList.error) {
-        return (
-          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue pt-5">
-            <h1 className="text-red-700">{visitorList.error}</h1>
-          </div>
-        );
-      } else {
-        setVisitors(visitorList.visitors);
-      }
-    }
+    if (!visitorList || visitorList.error) return;
+    setVisitors(visitorList.visitors || []);
   }, [visitorList]);
 
   const [visitorHeaders] = useState([

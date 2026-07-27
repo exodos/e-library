@@ -1,44 +1,19 @@
-FROM node:18-alpine AS builder
+FROM node:18-alpine
+
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-RUN if [ -f package-lock.json ]; then \
-			npm ci --legacy-peer-deps; \
-		else \
-			npm install --legacy-peer-deps; \
-		fi
+RUN apk add --no-cache openssl
 
-# Copy source, generate Prisma client (if present), then build
+COPY package*.json ./
+
+RUN npm ci --legacy-peer-deps
+
 COPY . .
-RUN npx prisma generate || true
-RUN npm run build
 
-FROM node:18-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
+RUN npx prisma generate
 
-# Install only production deps
-COPY package*.json ./
-RUN if [ -f package-lock.json ]; then \
-			npm ci --omit=dev --legacy-peer-deps; \
-		else \
-			npm install --omit=dev --legacy-peer-deps; \
-		fi
+RUN chmod +x docker-entrypoint.sh
 
-# Copy built assets and necessary runtime files
-COPY --from=builder /app/.next .next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/server.js ./server.js
-COPY --from=builder /app/next.config.js ./next.config.js
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/package.json ./package.json
-# Copy generated Prisma client from builder to runner
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY docker-entrypoint.sh ./docker-entrypoint.sh
-
-RUN chmod +x ./docker-entrypoint.sh
 EXPOSE 3000
 
 CMD ["./docker-entrypoint.sh"]

@@ -1,7 +1,7 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/solid";
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import ReactPaginate from "react-paginate";
+import ReactPaginate from "../../utils/ReactPaginate";
 import DeleteCatalogue from "./delete-catalogue";
 import EditCatalogue from "./edit-catalogue";
 import { UserContext } from "../../store/user-context";
@@ -18,23 +18,24 @@ const CatalogueList = ({ catalogueData }) => {
   const [showEditCatalogueModal, setShowEditCatalogueModal] = useState(false);
 
   useEffect(() => {
-    if (catalogueData) {
-      if (catalogueData.error) {
-        return (
-          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue pt-5">
-            <h1 className="text-red-700">{catalogueData.error}</h1>
-          </div>
-        );
-      } else {
-        setCatalogue(catalogueData.catalogue);
-      }
-    }
+    if (!catalogueData || catalogueData.error) return;
+    setCatalogue(catalogueData.catalogue || []);
   }, [catalogueData]);
 
   let allowed = false;
 
   if (!user) {
     return "Loading";
+  }
+
+  if (catalogueData?.error) {
+    return (
+      <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue pt-5">
+        <h1 className="text-red-700">
+          {catalogueData.error.message || catalogueData.error}
+        </h1>
+      </div>
+    );
   }
   if (user.role === "ADMIN") {
     allowed = true;

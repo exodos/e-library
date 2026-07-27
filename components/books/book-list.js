@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import ReactPaginate from "react-paginate";
+import ReactPaginate from "../../utils/ReactPaginate";
 import { useRouter } from "next/router";
 
 const BookList = ({ bookData }) => {
@@ -9,17 +9,8 @@ const BookList = ({ bookData }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (bookData) {
-      if (bookData?.error) {
-        return (
-          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue pt-5">
-            <h1 className="text-red-700">{bookData.error}</h1>
-          </div>
-        );
-      } else {
-        setBooks(bookData?.books);
-      }
-    }
+    if (!bookData || bookData.error) return;
+    setBooks(bookData.books || []);
   }, [bookData]);
 
   const handlePaginate = (page) => {
@@ -31,6 +22,14 @@ const BookList = ({ bookData }) => {
       query: query,
     });
   };
+
+  if (bookData?.error) {
+    return (
+      <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-5 border-2 border-t-deepBlue pt-5">
+        <h1 className="text-red-700">{bookData.error.message || bookData.error}</h1>
+      </div>
+    );
+  }
 
   return (
     <>
