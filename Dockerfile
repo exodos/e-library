@@ -10,6 +10,8 @@ RUN npm ci --legacy-peer-deps
 
 COPY . .
 
+RUN mkdir public
+
 RUN npx prisma generate
 
 RUN chmod +x docker-entrypoint.sh

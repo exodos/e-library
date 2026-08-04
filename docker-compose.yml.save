@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: e-library
+
+    ports:
+      - "3000:3000"
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: development
+      # SSR fetch must hit this container, not localhost/IPv6 or the public hostname
+      INTERNAL_BASE_URL: http://127.0.0.1:3000
+
+    volumes:
+      - .:/app
+
+
+      - /app/node_modules
+      - /app/.next
+
+    restart: unless-stopped

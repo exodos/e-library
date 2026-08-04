@@ -5,6 +5,32 @@ import prisma from "../../../utils/prisma";
 
 const url = `ldap://${process.env.LDAP_SERVER}`;
 
+function attr(value) {
+  if (value == null) return null;
+  if (Array.isArray(value)) value = value[0];
+  if (value == null) return null;
+  const text = String(value).trim();
+  return text || null;
+}
+
+function closeClient(client) {
+  try {
+    if (client && typeof client.unbind === "function") {
+      client.unbind(() => {});
+    }
+  } catch (err) {
+    // ignore cleanup errors
+  }
+}
+
+function authError(message) {
+  // NextAuth may put this into a Location header — keep it single-line/ASCII-safe.
+  const safe = String(message || "Authentication failed")
+    .replace(/[\r\n\t]+/g, " ")
+    .trim();
+  return new Error(safe);
+}
+
 export default NextAuth({
   providers: [
     CredentialsProvider({
@@ -14,38 +40,45 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        const { username, password } = credentials || {};
+        const username = attr(credentials?.username);
+        const password = credentials?.password;
         if (!username || !password) {
-          throw new Error("Please enter username and password");
+          throw authError("Please enter username and password");
         }
 
-        const client = ldap.createClient({
-          url,
+        const client = ldap.createClient({ url });
+        client.on("error", (err) => {
+          console.log("LDAP client error:", err?.message || err);
         });
 
         return new Promise((resolve, reject) => {
+          const fail = (message, detail) => {
+            if (detail) console.log("LDAP auth failure:", message, detail);
+            else console.log("LDAP auth failure:", message);
+            closeClient(client);
+            reject(authError(message));
+          };
+
           client.bind(
             `${username}@${process.env.LDAP_DOMAIN}`,
             password,
             (error) => {
               if (error) {
-                console.log(error);
-                client.unbind();
-                return reject(new Error("Wrong username or password."));
+                return fail("Wrong username or password.", error);
               }
-
-              const filter = `(sAMAccountName=${username})`;
 
               client.search(
                 process.env.LDAP_BASE_DN,
                 {
-                  filter,
+                  filter: `(sAMAccountName=${username})`,
                   scope: "sub",
                   attributes: [
                     "mail",
+                    "employeeID",
                     "employeeid",
                     "title",
                     "name",
+                    "displayName",
                     "division",
                     "department",
                     "section",
@@ -53,80 +86,116 @@ export default NextAuth({
                 },
                 (err, results) => {
                   if (err) {
-                    client.unbind();
-                    return reject(
-                      new Error(`User ${username} LDAP search error`)
-                    );
+                    return fail("LDAP search failed.", err);
                   }
 
                   const entries = [];
 
                   results.on("searchEntry", (entry) => {
-                    entries.push(entry.object);
+                    // ldapjs may expose .object or .pojo depending on version
+                    entries.push(entry.object || entry.pojo || entry);
                   });
 
                   results.on("error", (searchError) => {
-                    console.log(searchError);
-                    client.unbind();
-                    reject(new Error("LDAP SEARCH error"));
+                    fail("LDAP search stream error.", searchError);
                   });
 
                   results.on("end", async () => {
                     try {
                       if (entries.length === 0) {
-                        throw new Error(
-                          "Something went wrong. Please try again. (AD)"
-                        );
+                        throw authError("User not found in Active Directory.");
                       }
 
                       const adEmployee = entries[0];
-                      const empId = adEmployee?.employeeID;
-                      const fullName = adEmployee.name;
-                      const jobRole = adEmployee?.title;
-                      const [arrayRole] = (jobRole || "").split(" ").slice(-1);
-                      const email = adEmployee?.mail;
-                      const division = adEmployee?.division;
-                      const department = adEmployee?.department;
+                      const empIdRaw =
+                        attr(adEmployee.employeeID) ||
+                        attr(adEmployee.employeeId) ||
+                        attr(adEmployee.employeeid);
+                      const empId = empIdRaw ? parseInt(empIdRaw, 10) : NaN;
+                      const fullName =
+                        attr(adEmployee.name) ||
+                        attr(adEmployee.displayName) ||
+                        username;
+                      const jobRole = attr(adEmployee.title);
+                      const email =
+                        attr(adEmployee.mail) ||
+                        `${username}@ethiotelecom.et`;
+                      const division = attr(adEmployee.division);
+                      const department = attr(adEmployee.department);
+                      const lastTitleWord = (jobRole || "")
+                        .split(/\s+/)
+                        .filter(Boolean)
+                        .slice(-1)[0];
                       let role = "USER";
 
-                      if (!empId) {
-                        throw new Error("Employee ID missing from AD");
+                      if (!empIdRaw || Number.isNaN(empId)) {
+                        throw authError(
+                          "Employee ID missing or invalid in Active Directory."
+                        );
                       }
 
                       let user = await prisma.user.findUnique({
-                        where: {
-                          oracleId: parseInt(empId, 10),
-                        },
+                        where: { oracleId: empId },
                       });
 
                       if (!user) {
+                        // username unique collision — reuse existing account if present
+                        user = await prisma.user.findUnique({
+                          where: { userName: username },
+                        });
+                      }
+
+                      if (!user) {
                         if (
-                          arrayRole === "Officer" ||
-                          arrayRole === "Director"
+                          lastTitleWord === "Officer" ||
+                          lastTitleWord === "Director"
                         ) {
                           role = "CONTRIBUTOR";
                         }
 
-                        user = await prisma.user.create({
-                          data: {
-                            oracleId: parseInt(empId, 10),
-                            userName: username,
-                            fullName,
-                            jobRole,
-                            email,
-                            division,
-                            department,
-                            role,
-                          },
-                        });
+                        try {
+                          user = await prisma.user.create({
+                            data: {
+                              oracleId: empId,
+                              userName: username,
+                              fullName,
+                              jobRole,
+                              email,
+                              division,
+                              department,
+                              role,
+                            },
+                          });
+                        } catch (createErr) {
+                          // email unique collision: try find by email then username
+                          console.log(
+                            "User create failed:",
+                            createErr?.code,
+                            createErr?.message
+                          );
+                          user =
+                            (await prisma.user.findUnique({
+                              where: { email },
+                            })) ||
+                            (await prisma.user.findUnique({
+                              where: { userName: username },
+                            }));
+
+                          if (!user) {
+                            throw authError(
+                              "Could not create user account. Contact admin."
+                            );
+                          }
+                        }
                       }
 
+                      closeClient(client);
                       resolve(user);
                     } catch (err) {
-                      console.log(err);
-                      reject(err);
-                    } finally {
-                      client.unbind();
+                      fail(
+                        err?.message || "Authentication failed.",
+                        err
+                      );
                     }
                   });
                 }
@@ -164,6 +233,14 @@ export default NextAuth({
         };
       }
       return session;
+    },
+    redirect: async ({ url, baseUrl }) => {
+      // Guard against malformed Location headers
+      const cleanBase = String(baseUrl || "").replace(/[\r\n]/g, "").trim();
+      const cleanUrl = String(url || "").replace(/[\r\n]/g, "").trim();
+      if (cleanUrl.startsWith("/")) return `${cleanBase}${cleanUrl}`;
+      if (cleanUrl.startsWith(cleanBase)) return cleanUrl;
+      return cleanBase;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
