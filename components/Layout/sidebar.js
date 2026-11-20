@@ -688,7 +688,7 @@ const Sidebar = (props) => {
                       <div className="flex items-center">
                         <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
                           {/* Welcome To CLMS, {user.fullName} */}
-                          Welcome to TExA e-Library
+                          Welcome to E-Library
                         </h1>
                       </div>
                     </div>

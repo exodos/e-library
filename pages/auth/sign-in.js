@@ -31,7 +31,7 @@ const SignIn = ({ csrfToken }) => {
       <div className="min-h-full flex flex-col justify-center py-5 sm:px-6 lg:px-8 mt-20">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Welcome to TExA e-Library
+            Welcome to E-Library
           </h2>
         </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
